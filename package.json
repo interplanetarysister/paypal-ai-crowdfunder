@@ -1,0 +1,9 @@
+{
+  "name":"paypal-ai-crowdfunder",
+  "version":"1.0.0",
+  "private":true,
+  "type":"module",
+  "description":"Sandbox-only PayPal checkout and offline machine-learning crowdfunding demo",
+  "engines":{"node":">=20"},
+  "scripts":{"start":"node server.mjs","test":"node --test test/*.test.mjs"}
+}
