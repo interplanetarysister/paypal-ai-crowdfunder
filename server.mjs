@@ -110,5 +110,5 @@ export function createApp({dataDir=path.join(root,'.data'),paypal=makePayPal({cl
 if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){
   const host=process.env.HOST||'127.0.0.1',port=Number(process.env.PORT||3000);
   if(!['127.0.0.1','localhost'].includes(host))throw Error('Public binding is disabled for the authentication-free demo.');
-  createApp().listen(port,host,()=>console.log(`Crowdfunder sandbox demo: http://${host}:${port}`));
+  createApp({dataDir:process.env.DEMO_DATA_DIR||undefined}).listen(port,host,()=>console.log(`Crowdfunder sandbox demo: http://${host}:${port}`));
 }

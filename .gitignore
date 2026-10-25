@@ -152,3 +152,6 @@ vite.config.ts.timestamp-*
 .data/
 *.mp4
 *.webm
+
+# Local browser-demo videos and temporary evidence; never commit recordings.
+demo-artifacts/
