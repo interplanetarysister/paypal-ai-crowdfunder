@@ -48,6 +48,12 @@ test('sandbox readiness, declined-funding restart, and network-error capture ret
  const paypal=makePayPal({clientId:'fake-sandbox-id',secret:'fake-sandbox-secret',base:remote});
  const app=createApp({dataDir:folder,paypal}),base=await listen(app);
  try{
+  const homepage=await fetch(base+'/');
+  const markup=await homepage.text();
+  const nonce=markup.match(/name="paypal-csp-nonce" content="([A-Za-z0-9+/=]+)"/)?.[1];
+  assert.ok(nonce,'page includes cryptographically generated nonce');
+  assert.ok(homepage.headers.get('content-security-policy').includes(`'nonce-${nonce}'`));
+  assert.equal(homepage.headers.get('cross-origin-opener-policy'),'same-origin-allow-popups');
   assert.deepEqual((await request(base,'/api/paypal/readiness')).body,{sandbox:true,verifiedCredentials:true});
   const order1=await request(base,'/api/orders',{campaignId:'clean-coast',amount:'5'});
   assert.equal(order1.status,201);
