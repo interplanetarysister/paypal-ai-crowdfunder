@@ -17,9 +17,19 @@ by('draft-form').addEventListener('submit',async e=>{
  e.preventDefault();notice('draft-message','Training-data model is preparing suggestions…');
  try{const {draft}=await jsonFetch('/api/ai/draft',{method:'POST',body:JSON.stringify({who:by('who').value,need:by('need').value,impact:by('impact').value,goal:by('goal').value})});
  by('result').hidden=false;by('draft-title').value=draft.titles[0];by('draft-summary').value=draft.summary;by('draft-story').value=draft.story;
+ const options=by('draft-title-options');options.replaceChildren();for(const title of draft.titles){const option=document.createElement('option');option.value=title;option.textContent=title;options.append(option);}options.value=draft.titles[0];
  by('ai-reason').textContent=`Suggested category: ${draft.category} · Audience: ${draft.audience} · ${draft.disclaimer}`;by('result').dataset.category=draft.category;
  notice('draft-message','Draft ready. Review the claims, title, and story before saving.');by('result').scrollIntoView({behavior:'smooth',block:'nearest'});
  }catch(e){notice('draft-message',e.message,true);}
+});
+by('draft-title-options').addEventListener('change',()=>{by('draft-title').value=by('draft-title-options').value;});
+by('load-demo').addEventListener('click',()=>{
+ by('who').value='Our neighborhood coastal cleanup volunteers';
+ by('need').value='Reusable gloves, litter grabbers, and waste bags for a shoreline cleanup';
+ by('impact').value='Remove litter from the shoreline and protect nearby habitats';
+ by('goal').value='500';
+ notice('draft-message','Example loaded. Select Generate an AI-assisted draft to see the local model work.');
+ by('create').scrollIntoView({behavior:'smooth',block:'start'});by('who').focus({preventScroll:true});
 });
 by('save-campaign').onclick=async()=>{
  const button=by('save-campaign');button.disabled=true;
