@@ -2,7 +2,7 @@ import http from 'node:http';
 import {readFile} from 'node:fs/promises';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {randomUUID} from 'node:crypto';
+import {randomUUID,randomBytes} from 'node:crypto';
 import {makeStore} from './src/store.mjs';
 import {makePayPal} from './src/paypal.mjs';
 import {propose} from './src/ai.mjs';
@@ -69,8 +69,11 @@ export function createApp({dataDir=path.join(root,'.data'),paypal=makePayPal({cl
     try{
       if(req.method==='GET'&&files[url.pathname]){
         const name=files[url.pathname];const ext=name.split('.').at(-1);const text=await readFile(path.join(root,'public',name));
-        const csp="default-src 'self'; script-src 'self' https://www.paypal.com https://www.paypalobjects.com; connect-src 'self' https://www.paypal.com https://www.sandbox.paypal.com; frame-src https://www.paypal.com https://www.sandbox.paypal.com; img-src 'self' data: https://www.paypalobjects.com https://www.paypal.com; style-src 'self' 'unsafe-inline'; base-uri 'none'; form-action 'self'";
-        res.writeHead(200,{'content-type':mime[ext], 'cache-control':'no-store','content-security-policy':csp,'x-content-type-options':'nosniff'});res.end(text);return;
+        const nonce=randomBytes(18).toString('base64');
+        const payload=name==='index.html'?text.toString('utf8').replace('__PAYPAL_CSP_NONCE__',nonce):text;
+        const paypalSources='https://*.paypal.com https://*.paypalobjects.com https://*.venmo.com';
+        const csp=`default-src 'self'; script-src 'self' 'nonce-${nonce}' ${paypalSources}; connect-src 'self' ${paypalSources}; child-src 'self' ${paypalSources}; frame-src 'self' ${paypalSources}; img-src 'self' data: ${paypalSources}; style-src 'self' 'unsafe-inline' ${paypalSources}; base-uri 'none'; form-action 'self' https://*.paypal.com`;
+        res.writeHead(200,{'content-type':mime[ext], 'cache-control':'no-store','content-security-policy':csp,'cross-origin-opener-policy':'same-origin-allow-popups','x-content-type-options':'nosniff'});res.end(payload);return;
       }
       if(req.method==='GET'&&url.pathname==='/api/status')return respond(res,200,{sandbox:true,paypalConfigured:paypal.configured,clientId:paypal.clientId,ai:{type:'Multinomial Naive Bayes',local:true,noPaidCredits:true},version:'1.0.0'});
       if(req.method==='GET'&&url.pathname==='/api/paypal/readiness'){
