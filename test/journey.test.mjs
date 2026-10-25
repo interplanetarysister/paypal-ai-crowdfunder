@@ -18,6 +18,7 @@ test('guided browser assets and real AI-to-saved-campaign journey, no PayPal cre
     const html=await home.text();
     assert.match(html,/id="load-demo"/);
     assert.match(html,/id="draft-title-options"/);
+    assert.doesNotMatch(html,/id="draft-title"[^>]*required/);
     assert.match(html,/PAYPAL SANDBOX DEMO/);
     for(const route of ['/app.js','/style.css']){
       const asset=await fetch(base+route);
