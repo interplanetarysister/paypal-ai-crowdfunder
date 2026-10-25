@@ -11,12 +11,19 @@ export function makePayPal({clientId,secret,base='https://api-m.sandbox.paypal.c
     const access=await token();const headers={authorization:'Bearer '+access,'content-type':'application/json'};
     if(requestId)headers['PayPal-Request-Id']=requestId;
     const res=await fetch(base+endpoint,{method,headers,body:body?JSON.stringify(body):undefined,signal:AbortSignal.timeout(20000)});
-    const json=await res.json().catch(()=>({}));if(!res.ok)throw Object.assign(Error(`PayPal sandbox request failed (${res.status})`),{status:502});return json;
+    const json=await res.json().catch(()=>({}));
+    if(!res.ok){
+      const issue=json.details?.[0]?.issue;
+      if(issue==='INSTRUMENT_DECLINED')throw Object.assign(Error('Sandbox funding source declined. Choose a different funding method.'),{status:409,code:'INSTRUMENT_DECLINED'});
+      if(issue==='ORDER_NOT_APPROVED')throw Object.assign(Error('Buyer approval is required before capture.'),{status:409,code:'ORDER_NOT_APPROVED'});
+      throw Object.assign(Error(`PayPal sandbox request failed (${res.status})`),{status:502});
+    }
+    return json;
   }
   async function create(campaign,amount,idempotency){
     return api('/v2/checkout/orders','POST',{intent:'CAPTURE',purchase_units:[{reference_id:campaign.id,custom_id:campaign.id,description:campaign.title.slice(0,127),amount:{currency_code:'USD',value:(amount/100).toFixed(2)}}]},idempotency);
   }
-  return {configured,clientId:configured?clientId:null,create,capture:(id,reqId)=>api('/v2/checkout/orders/'+encodeURIComponent(id)+'/capture','POST',undefined,reqId),get:(id)=>api('/v2/checkout/orders/'+encodeURIComponent(id)),verify:async(headers,event,webhookId)=>{
+  return {configured,clientId:configured?clientId:null,checkCredentials:async()=>Boolean(await token()),create,capture:(id,reqId)=>api('/v2/checkout/orders/'+encodeURIComponent(id)+'/capture','POST',undefined,reqId),get:(id)=>api('/v2/checkout/orders/'+encodeURIComponent(id)),verify:async(headers,event,webhookId)=>{
     if(!webhookId)return false;
     const body={auth_algo:headers.get('paypal-auth-algo'),cert_url:headers.get('paypal-cert-url'),transmission_id:headers.get('paypal-transmission-id'),transmission_sig:headers.get('paypal-transmission-sig'),transmission_time:headers.get('paypal-transmission-time'),webhook_id:webhookId,webhook_event:event};
     if(Object.values(body).some(v=>!v))return false;
