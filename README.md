@@ -2,7 +2,7 @@
 
 A **runnable, sandbox-only, AI-assisted crowdfunding demonstration**, developed independently from the live Interplanetary Fund service. The locally trained multinomial Naive Bayes model classifies campaign needs and suggests an audience; reviewed campaign copy then leads into a **real PayPal Sandbox Orders v2 checkout** when the tester provides their own free sandbox API credentials. No live money, automatic payouts, platform affiliations, metered AI API credits, or user-account migration are involved.
 
-**Status (October 22, 2026):** application and automated mock-provider tests exist. Real PayPal sandbox capture, webhook delivery, full browser-recorded demo, and the public YouTube video are **not yet verified**. This repository is not evidence of a completed PayPal test or Devpost submission.
+**Status (October 25, 2026):** the guided AI-to-saved-campaign flow was exercised in an isolated local browser environment, and the three Node integration tests passed in a local source copy. An optional browser recorder generated a 38-second AI walkthrough (not a PayPal checkout video). Real PayPal sandbox capture, webhook delivery, an end-to-end payment demonstration, and the public YouTube video are **not yet verified**. This repository is not evidence of a completed PayPal test or Devpost submission.
 
 ## Requirements
 
