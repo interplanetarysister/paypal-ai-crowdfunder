@@ -1,5 +1,7 @@
 # Required under-three-minute PayPal AI Hackathon demo
 
+**Detailed script and instructions:** [DEMO_RUNBOOK.md](DEMO_RUNBOOK.md). The optional recorder is intentionally a no-payment AI walkthrough; it cannot replace the required real sandbox capture segment of the full video.
+
 This is a shot list for recording the real running web app. **Do not imply the sandbox has been tested until a real PayPal Sandbox order completes.** Never fabricate a PayPal receipt, payment, webhook, or Devpost entry.
 
 | Timeline | Genuine screen footage |
