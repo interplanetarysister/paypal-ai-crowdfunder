@@ -30,9 +30,9 @@ The script starts the **real application** on loopback with temporary isolated d
 
 1. Create a PayPal sandbox REST app and personal **sandbox buyer** in https://developer.paypal.com/.
 2. Export `PAYPAL_CLIENT_ID` and `PAYPAL_CLIENT_SECRET` into your local process, or load an ignored `.env`; **never** commit them, a payment receipt, buyer details, or the webhook secret.
-3. Run `node server.mjs`. Confirm **PayPal sandbox connected**; click Donate on a sample campaign.
-4. Use the sandbox buyer to approve payment; verify the UI shows a **verified sandbox capture ID** and the correct campaign/amount. Independently cross-check the order/capture in the PayPal Developer Sandbox activity.
-5. Replay the capture endpoint with the *same order*; confirm the campaign total and donation count do not increase again.
+3. Run `node server.mjs`. The app will validate the Sandbox REST credentials without initiating a payment. Confirm **PayPal Sandbox API connected — buyer checkout still requires approval**; click Donate on a sample campaign. If credential validation fails, check that the ID and secret belong to the same **Sandbox** REST app (never use Live credentials).
+4. Use the sandbox personal buyer to approve the payment (the buyer account must be different from the seller Sandbox account). Verify the UI shows a **verified sandbox capture ID** and the correct campaign/amount. Independently cross-check the order/capture in the PayPal Developer Sandbox activity. If the method is declined, choose another funding source in PayPal; if capture verification fails after approval, select **Retry capture verification**, not a fresh donation.
+5. Replay the capture endpoint with the *same approved order*; confirm the campaign total and donation count do not increase again. Retrying uses the same capture idempotency key unless PayPal reports a funding decline, after which a fresh key permits a new buyer-approved attempt.
 6. Optionally configure a real signed webhook using a temporary secured HTTPS endpoint. Supply `PAYPAL_WEBHOOK_ID`; verify `PAYMENT.CAPTURE.COMPLETED`, repeat the event, and confirm only one credit. Tear down any temporary tunnel when finished.
 7. Never publish a public auth-free deployment or live financial checkout as part of this local demo.
 
