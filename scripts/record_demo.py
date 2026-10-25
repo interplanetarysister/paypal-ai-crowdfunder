@@ -49,7 +49,7 @@ def main():
             else:
                 raise RuntimeError('Local server did not become ready.')
             with sync_playwright() as p:
-                browser=p.chromium.launch(headless=True)
+                browser=p.chromium.launch(headless=True, executable_path=shutil.which('chromium') or shutil.which('google-chrome') or None)
                 ctx=browser.new_context(viewport={'width':1280,'height':720},record_video_dir=str(OUT),record_video_size={'width':1280,'height':720},device_scale_factor=1)
                 page=ctx.new_page()
                 page.goto(url,wait_until='networkidle')
