@@ -45,7 +45,7 @@ by('save-campaign').onclick=async()=>{
 };
 function loadSdk(){if(paypalLoaded)return Promise.resolve();return new Promise((resolve,reject)=>{
  if(!sandbox.clientId)return reject(Error('PayPal client ID missing'));
- const script=document.createElement('script');script.src='https://www.paypal.com/sdk/js?client-id='+encodeURIComponent(sandbox.clientId)+'&currency=USD&intent=capture&components=buttons';script.onload=()=>{paypalLoaded=true;resolve()};script.onerror=()=>reject(Error('PayPal SDK could not load'));document.head.append(script);
+ const script=document.createElement('script');const nonce=document.querySelector('meta[name="paypal-csp-nonce"]')?.content;if(nonce){script.nonce=nonce;script.setAttribute('data-csp-nonce',nonce);}script.src='https://www.paypal.com/sdk/js?client-id='+encodeURIComponent(sandbox.clientId)+'&currency=USD&intent=capture&components=buttons';script.onload=()=>{paypalLoaded=true;resolve()};script.onerror=()=>reject(Error('PayPal SDK could not load'));document.head.append(script);
 });}
 async function finalizeCapture(orderId,actions){
  notice('payment-message','Checking completed PayPal Sandbox capture…');
