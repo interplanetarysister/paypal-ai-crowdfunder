@@ -15,7 +15,7 @@ export function createApp({dataDir=path.join(root,'.data'),paypal=makePayPal({cl
     const text=typeof body==='string'?body:JSON.stringify(body);
     res.writeHead(status,{'content-type':'application/json; charset=utf-8','cache-control':'no-store','x-content-type-options':'nosniff','referrer-policy':'no-referrer',...extra});res.end(text);
   };
-  const error=(res,e)=>respond(res,e.status&&[400,401,403,404,409,413,503].includes(e.status)?e.status:500,{error:e.status&&e.status<500?e.message:'Request could not be completed. Check the server log.'});
+  const error=(res,e)=>respond(res,e.status&&[400,401,403,404,409,413,502,503].includes(e.status)?e.status:500,{error:e.status&&e.status<500?e.message:'Request could not be completed. Check the server log.',...(e.code==='INSTRUMENT_DECLINED'||e.code==='ORDER_NOT_APPROVED'?{code:e.code}:{})});
   const bad=(message,status=400)=>Object.assign(new Error(message),{status});
   const body=async req=>{
     if(!req.headers['content-type']?.startsWith('application/json'))throw bad('JSON request required.');
@@ -41,7 +41,18 @@ export function createApp({dataDir=path.join(root,'.data'),paypal=makePayPal({cl
       const initial=await store.load(),record=initial.orders[orderId];if(!record)throw bad('Unknown PayPal order.',404);
       if(record.captureId&&initial.captures[record.captureId])return initial.captures[record.captureId];
       let remote=await paypal.get(orderId);
-      if(requestCapture&&remote.status!=='COMPLETED')remote=await paypal.capture(orderId,record.captureRequestId);
+      if(requestCapture&&remote.status!=='COMPLETED'){
+        try{remote=await paypal.capture(orderId,record.captureRequestId);}
+        catch(e){
+          // A declined funding attempt needs a NEW idempotency key after the
+          // buyer selects another method. For timeouts, preserve the key.
+          if(e.code==='INSTRUMENT_DECLINED')await store.transact(s=>{
+            const order=s.orders[orderId];
+            if(order&&order.captureRequestId===record.captureRequestId)order.captureRequestId=randomUUID();
+          });
+          throw e;
+        }
+      }
       const captureId=verifiedCapture(remote,record);
       return store.transact(s=>{
         const same=s.orders[orderId];if(!same||same.campaignId!==record.campaignId||same.amount!==record.amount)throw bad('Order details changed.',409);
@@ -62,6 +73,11 @@ export function createApp({dataDir=path.join(root,'.data'),paypal=makePayPal({cl
         res.writeHead(200,{'content-type':mime[ext], 'cache-control':'no-store','content-security-policy':csp,'x-content-type-options':'nosniff'});res.end(text);return;
       }
       if(req.method==='GET'&&url.pathname==='/api/status')return respond(res,200,{sandbox:true,paypalConfigured:paypal.configured,clientId:paypal.clientId,ai:{type:'Multinomial Naive Bayes',local:true,noPaidCredits:true},version:'1.0.0'});
+      if(req.method==='GET'&&url.pathname==='/api/paypal/readiness'){
+        if(!paypal.configured)throw bad('PayPal Sandbox credentials are not configured.',503);
+        await paypal.checkCredentials();
+        return respond(res,200,{sandbox:true,verifiedCredentials:true});
+      }
       if(req.method==='GET'&&url.pathname==='/api/campaigns')return respond(res,200,{campaigns:totals(await store.load())});
       if(req.method==='GET'&&url.pathname==='/api/health')return respond(res,200,{status:'ok',sandbox:true});
       if(!['POST'].includes(req.method))return respond(res,404,{error:'Route not found.'});
