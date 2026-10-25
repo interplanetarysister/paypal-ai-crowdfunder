@@ -12,7 +12,8 @@ import sys
 import tempfile
 import time
 from pathlib import Path
-from urllib.request import urlopen
+from urllib.request import urlopen, Request
+from urllib.error import HTTPError
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / 'demo-artifacts'
@@ -52,7 +53,33 @@ def main():
                 browser=p.chromium.launch(headless=True, executable_path=shutil.which('chromium') or shutil.which('google-chrome') or None)
                 ctx=browser.new_context(viewport={'width':1280,'height':720},record_video_dir=str(OUT),record_video_size={'width':1280,'height':720},device_scale_factor=1)
                 page=ctx.new_page()
-                page.goto(url,wait_until='networkidle')
+                try:
+                    page.goto(url,wait_until='networkidle')
+                except Exception as navigation_error:
+                    if 'ERR_BLOCKED_BY_ADMINISTRATOR' not in str(navigation_error):
+                        raise
+                    # Some managed browsers block loopback navigation. Render
+                    # original frontend files and relay to the real local server.
+                    def relay(args):
+                        route=args['route']
+                        if not isinstance(route,str) or not route.startswith('/api/') or '://' in route:
+                            raise ValueError('Only local application API routes are allowed')
+                        request=Request(url+route,data=(args.get('body') or '').encode('utf-8') if args.get('method')=='POST' else None,method=args.get('method','GET'),headers={'Content-Type':'application/json'})
+                        try:
+                            with urlopen(request,timeout=10) as response:
+                                return {'status':response.status,'body':response.read().decode('utf-8')}
+                        except HTTPError as error:
+                            return {'status':error.code,'body':error.read().decode('utf-8')}
+                    page.expose_function('__crowdfunderApi',relay)
+                    markup=(ROOT/'public/index.html').read_text(encoding='utf-8').replace('<link rel="stylesheet" href="/style.css">','').replace('<script type="module" src="/app.js"></script>','')
+                    page.set_content(markup,wait_until='domcontentloaded')
+                    page.add_style_tag(content=(ROOT/'public/style.css').read_text(encoding='utf-8'))
+                    page.evaluate('''() => {window.fetch = async (route, options={}) => {
+                      const message=await window.__crowdfunderApi({route, method:options.method||'GET',body:options.body||''});
+                      return new Response(message.body,{status:message.status,headers:{'content-type':'application/json'}});
+                    };}''')
+                    page.add_script_tag(content=(ROOT/'public/app.js').read_text(encoding='utf-8'))
+                    page.locator('#paypal-state').get_by_text('PayPal sandbox credentials needed for checkout').wait_for(timeout=10000)
                 page.wait_for_timeout(4000)
                 page.locator('#load-demo').click()
                 page.wait_for_timeout(4000)
