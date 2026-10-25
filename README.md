@@ -21,7 +21,21 @@ node server.mjs
 # Open http://127.0.0.1:3000
 ```
 
-Without credentials the app remains runnable: create AI-assisted drafts, edit and save demo campaigns, see campaign cards. Donation buttons clearly remain disabled. To test **real PayPal sandbox payment capture**, set both `PAYPAL_CLIENT_ID` and `PAYPAL_CLIENT_SECRET`, restart, click Donate on a campaign, and authenticate using a **PayPal sandbox personal buyer**, not a live account. The server receives and checks completed PayPal capture records before changing visible totals.
+Without credentials the app remains runnable: select **Try a guided example**, generate a local AI-assisted draft, select among three suggested titles, edit and save the demo campaign, and explore the saved cards. Donation buttons clearly remain disabled. To test **real PayPal sandbox payment capture**, set both `PAYPAL_CLIENT_ID` and `PAYPAL_CLIENT_SECRET`, restart, click Donate on a campaign, and authenticate using a **PayPal sandbox personal buyer**, not a live account. The server receives and checks completed PayPal capture records before changing visible totals.
+
+## Guided demonstration and optional real-browser recording
+
+See **[Demo runbook](docs/DEMO_RUNBOOK.md)** for the step-by-step guided example, isolated local Playwright recording, true sandbox verification checklist, and a timed under-three-minute video script. A no-credentials browser recording proves only the interactive AI campaign flow. It is **not** evidence of a completed PayPal sandbox purchase, live webhook, YouTube upload, or Devpost submission.
+
+The optional recorder requires Python Playwright and a Chromium browser (not required by the app):
+
+```bash
+python3 -m pip install playwright
+python3 -m playwright install chromium
+python3 scripts/record_demo.py
+```
+
+The recorder starts a fresh local server with temporary campaign storage and explicitly unsets all PayPal credentials; it saves a real-browser walkthrough to an ignored `demo-artifacts/` directory. No paid API or GitHub Actions usage is required.
 
 ## Sandbox webhook
 
@@ -33,7 +47,7 @@ Configure a sandbox webhook on your PayPal app with a publicly reachable **HTTPS
 npm test
 ```
 
-No GitHub Actions workflow is installed and this project does not spend CI minutes automatically. Tests run against a local **mock PayPal service**, not the live PayPal sandbox. They cover local AI classification, server-calculated amount boundaries, cross-origin rejection, capture verification, exactly-once credit, signature rejection, webhook replay, and mismatched-capture refusal.
+No GitHub Actions workflow is installed and this project does not spend CI minutes automatically. Tests run against a local **mock PayPal service**, not the live PayPal sandbox. They cover local AI classification, server-calculated amount boundaries, cross-origin rejection, capture verification, exactly-once credit, signature rejection, webhook replay, mismatched-capture refusal, static demo assets, the draft-to-saved-campaign flow, denied payment when no sandbox credentials are present, and local campaign persistence.
 
 ## Architecture
 
