@@ -1,8 +1,8 @@
 const by=id=>document.getElementById(id);
 const money=cents=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(cents/100);
-let sandbox,selectedCampaign=null,paypalLoaded=false;
+let sandbox,selectedCampaign=null,paypalLoaded=false,approvedOrderId=null;
 const notice=(id,message,error=false)=>{by(id).textContent=message;by(id).classList.toggle('error',error);};
-async function jsonFetch(url,options){const response=await fetch(url,{...options,headers:{'content-type':'application/json',...options?.headers}});const data=await response.json();if(!response.ok)throw Error(data.error||'Request failed');return data;}
+async function jsonFetch(url,options){const response=await fetch(url,{...options,headers:{'content-type':'application/json',...options?.headers}});const data=await response.json();if(!response.ok){const error=Error(data.error||'Request failed');error.code=data.code;throw error;}return data;}
 function el(tag,text,css){const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(css)e.className=css;return e;}
 async function loadCampaigns(){
  const {campaigns}=await jsonFetch('/api/campaigns');const grid=by('campaign-grid');grid.replaceChildren();
@@ -12,7 +12,15 @@ async function loadCampaigns(){
  const button=el('button',sandbox.paypalConfigured?'Donate with PayPal':'PayPal setup required','primary');button.disabled=!sandbox.paypalConfigured;button.onclick=()=>openCheckout(c);card.append(button);grid.append(card);
  }
 }
-async function start(){try{sandbox=await jsonFetch('/api/status');by('paypal-state').textContent=sandbox.paypalConfigured?'PayPal sandbox connected':'PayPal sandbox credentials needed for checkout';await loadCampaigns();}catch(e){by('paypal-state').textContent='Cannot reach local demo server';console.error(e);}}
+async function start(){try{
+ sandbox=await jsonFetch('/api/status');
+ if(sandbox.paypalConfigured){
+  by('paypal-state').textContent='Checking PayPal Sandbox credentials…';
+  try{await jsonFetch('/api/paypal/readiness');by('paypal-state').textContent='PayPal Sandbox API connected — buyer checkout still requires approval';}
+  catch(e){sandbox.paypalConfigured=false;by('paypal-state').textContent='PayPal Sandbox credential check failed: '+e.message;}
+ }else{by('paypal-state').textContent='PayPal Sandbox credentials needed for checkout';}
+ await loadCampaigns();
+ }catch(e){by('paypal-state').textContent='Cannot reach local demo server';console.error(e);}}
 by('draft-form').addEventListener('submit',async e=>{
  e.preventDefault();notice('draft-message','Training-data model is preparing suggestions…');
  try{const {draft}=await jsonFetch('/api/ai/draft',{method:'POST',body:JSON.stringify({who:by('who').value,need:by('need').value,impact:by('impact').value,goal:by('goal').value})});
@@ -39,11 +47,44 @@ function loadSdk(){if(paypalLoaded)return Promise.resolve();return new Promise((
  if(!sandbox.clientId)return reject(Error('PayPal client ID missing'));
  const script=document.createElement('script');script.src='https://www.paypal.com/sdk/js?client-id='+encodeURIComponent(sandbox.clientId)+'&currency=USD&intent=capture&components=buttons';script.onload=()=>{paypalLoaded=true;resolve()};script.onerror=()=>reject(Error('PayPal SDK could not load'));document.head.append(script);
 });}
-async function openCheckout(c){selectedCampaign=c;by('donation-title').textContent='Support '+c.title;notice('payment-message','');by('donation-dialog').showModal();
- try{await loadSdk();by('paypal-buttons').replaceChildren();window.paypal.Buttons({
- createOrder:async()=>{const a=by('donation-amount').value;const {id}=await jsonFetch('/api/orders',{method:'POST',body:JSON.stringify({campaignId:selectedCampaign.id,amount:a})});return id;},
- onApprove:async data=>{notice('payment-message','Verifying the completed PayPal capture…');try{const {donation}=await jsonFetch('/api/orders/'+encodeURIComponent(data.orderID)+'/capture',{method:'POST',body:'{}'});notice('payment-message',`Verified sandbox capture ${donation.id}. Amount ${money(donation.amount)} credited once.`);await loadCampaigns();}catch(e){notice('payment-message',e.message,true);}},
- onError:e=>notice('payment-message',e.message||'PayPal checkout failed',true),onCancel:()=>notice('payment-message','Checkout canceled; no donation credited.')
- }).render('#paypal-buttons');}catch(e){notice('payment-message',e.message,true);}
+async function finalizeCapture(orderId,actions){
+ notice('payment-message','Checking completed PayPal Sandbox capture…');
+ try{
+  const {donation}=await jsonFetch('/api/orders/'+encodeURIComponent(orderId)+'/capture',{method:'POST',body:'{}'});
+  approvedOrderId=null;by('retry-capture').hidden=true;
+  notice('payment-message',`Verified sandbox capture ${donation.id}. Amount ${money(donation.amount)} credited once.`);
+  await loadCampaigns();
+ }catch(error){
+  if(error.code==='INSTRUMENT_DECLINED'&&actions?.restart){
+   approvedOrderId=null;by('retry-capture').hidden=true;
+   notice('payment-message','Sandbox payment method declined. Select another funding source.');
+   return actions.restart();
+  }
+  notice('payment-message',error.message+' If you approved payment, retry verification; do not create a second order.',true);
+  by('retry-capture').hidden=false;
+ }
+}
+by('retry-capture').addEventListener('click',async()=>{
+ if(!approvedOrderId)return;
+ const button=by('retry-capture');button.disabled=true;
+ try{await finalizeCapture(approvedOrderId);}finally{button.disabled=false;}
+});
+async function openCheckout(c){
+ selectedCampaign=c;approvedOrderId=null;by('retry-capture').hidden=true;
+ by('donation-title').textContent='Support '+c.title;
+ notice('payment-message','');by('donation-dialog').showModal();
+ try{
+  await loadSdk();by('paypal-buttons').replaceChildren();
+  await window.paypal.Buttons({
+   createOrder:async()=>{
+    const input=by('donation-amount');if(!input.reportValidity())throw Error('Enter a valid donation amount.');
+    const {id}=await jsonFetch('/api/orders',{method:'POST',body:JSON.stringify({campaignId:c.id,amount:input.value})});
+    return id;
+   },
+   onApprove:async(data,actions)=>{approvedOrderId=data.orderID;await finalizeCapture(data.orderID,actions);},
+   onError:error=>notice('payment-message',error?.message||'Sandbox checkout failed. No donation has been confirmed.',true),
+   onCancel:()=>{approvedOrderId=null;by('retry-capture').hidden=true;notice('payment-message','Checkout canceled; no donation credited.');}
+  }).render('#paypal-buttons');
+ }catch(e){notice('payment-message',e.message,true);}
 }
 start();
