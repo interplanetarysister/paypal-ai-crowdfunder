@@ -77,3 +77,16 @@ Read [JUDGE_TESTING.md](docs/JUDGE_TESTING.md), [COMPLIANCE.md](docs/COMPLIANCE.
 - **Testing:** `tests/payments.test.ts` verifies the new focus endpoint does not modify ledger totals and that anonymous direct database access is denied.
 
 The demo is intentionally self-contained apart from its already configured Supabase, Cloudflare and PayPal Sandbox integrations. The AG Charts CDN dependency needs network access; the fallback remains readable without it.
+
+## PayPal Sandbox test-card checkout (2026-11-11)
+
+The guide now provides two **distinct** sandbox checkout methods: PayPal Personal account redirect and PayPal JavaScript SDK v6 **hosted Card Fields**, rendered only when PayPal reports `advanced_cards` eligibility for the sandbox merchant.
+
+- `GET /api/paypal/browser-token` requires a separate authenticated demo account and returns a short-lived, browser-safe SDK token; it never discloses the merchant Client Secret or a full merchant OAuth access token.
+- `POST /api/paypal/orders` accepts `checkout_method: "card"` or `"paypal"` and binds method, amount, purpose and campaign to the same idempotency key.
+- Card details are typed **only inside PayPal-hosted iframes**. No PAN, expiration, CVV, or billing secrets enter IFund's Worker, Supabase, logs, GitHub or receipts.
+- `db/005_sandbox_card_checkout.sql` adds an isolated checkout-method label to `public.ifund_demo_orders`; all previous records retain `paypal`. This migration has been applied to the existing isolated demo schema.
+- The existing server verifies PayPal merchant, purpose, currency, amount and capture status before finalizing a balanced ledger and receipt. The card SDK success event by itself is **not** a verified donation.
+- Code tests use mocked PayPal responses and PGlite. They verify authorization, idempotency, rejected cross-method reuse, and exactly-once ledger/receipt persistence. **They are not genuine card charges.**
+- Real card testing requires an eligible PayPal Sandbox merchant and **test card credentials only** from PayPal's developer test-card generator. Cards shown in screenshots are never embedded in the application. The browser may show a card option only if eligible. Testing success/decline/3DS and replay remains **not verified against the live provider** until corresponding PayPal capture/receipt IDs are recorded.
+- Never use real card numbers, even for a nominal amount, in this sandbox demo. No live payments, withdrawals, subscriptions or production ledger changes are possible in this isolated Worker.
