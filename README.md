@@ -90,3 +90,16 @@ The guide now provides two **distinct** sandbox checkout methods: PayPal Persona
 - Code tests use mocked PayPal responses and PGlite. They verify authorization, idempotency, rejected cross-method reuse, and exactly-once ledger/receipt persistence. **They are not genuine card charges.**
 - Real card testing requires an eligible PayPal Sandbox merchant and **test card credentials only** from PayPal's developer test-card generator. Cards shown in screenshots are never embedded in the application. The browser may show a card option only if eligible. Testing success/decline/3DS and replay remains **not verified against the live provider** until corresponding PayPal capture/receipt IDs are recorded.
 - Never use real card numbers, even for a nominal amount, in this sandbox demo. No live payments, withdrawals, subscriptions or production ledger changes are possible in this isolated Worker.
+
+
+## AG Grid Community finance dashboard (free)
+
+The donor, organizer and administrator transaction history in `/dashboard` uses **AG Grid Community 36.3.0** (MIT/free), loaded only when that authenticated view opens. It shows only the authorized role-filtered rows returned by the existing server-side `/api/finance` endpoint, with sortable/filterable amount, status, reconciliation, PayPal order/capture identifiers, and timestamp columns, plus a link to each authorized receipt.
+
+No Enterprise grid features, license or premium APIs are loaded. Browser sorting and filters do not grant access to any additional records; owner/admin permissions are enforced by the API. For accessibility and temporary CDN failures the original transaction list and receipt/reconciliation links remain available in a disclosure panel.
+
+The demo funding donut uses AG Charts Community (free) and the globe uses free interactive SVG, independently of AG Grid. All three visualizations are non-financially authoritative: verified payment figures are derived from PayPal provider captures; simulated agent-focus units never credit money.
+
+**3DS safeguard:** SDK v6 and the server enforce a conservative 3-D Secure card policy. Before a provider CAPTURE call for a card order, the server queries PayPal Orders v2 `?fields=payment_source` and inspects `payment_source.card.authentication_result`. A clear failure/unknown result blocks the capture. Issuer-not-enrolled/bypassed cases follow PayPal's response guidance; no cardholder credentials are logged or stored.
+
+Automated tests include three distinct **mock-provider** card-funded contribution scenarios, cross-purpose totals, 3DS failures, idempotency, ledger balancing and receipts. Genuine sandbox card-funded captures still require provider-side evidence and are not asserted as completed.
