@@ -34,6 +34,7 @@ export interface Status {
   ai_configured: boolean;
   media_configured: boolean;
   release_sha: string;
+  provider_acceptance?: string;
 }
 export const labels: Record<string, string> = {
   emergency: "Emergency assistance",
