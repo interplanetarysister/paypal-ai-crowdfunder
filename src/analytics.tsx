@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ChartNoAxesCombined, Globe2, ShieldCheck } from "lucide-react";
-import { labels, money, type Campaign } from "./api";
+import { api, labels, money, type Campaign } from "./api";
+import { Donut, type AgentFocus } from "./charts";
+import { summarizeDemoCampaigns } from "./analytics-summary";
 import {
   loadCommunityGrid,
   type GridApi,
@@ -19,15 +21,52 @@ export function CampaignAnalytics() {
   const { data, error, loading } = useData<{ campaigns: Campaign[] }>("/campaigns");
   const campaigns = useMemo(() => data?.campaigns || [], [data]);
   const [gridState, setGridState] = useState<"loading" | "ready" | "fallback">("loading");
+  const [selectedCampaignId, setSelectedCampaignId] = useState("");
+  const [agentFocus, setAgentFocus] = useState<AgentFocus | null>(null);
+  const [focusLoading, setFocusLoading] = useState(false);
+  const [focusError, setFocusError] = useState("");
   const container = useRef<HTMLDivElement | null>(null);
 
-  const stats = useMemo(() => ({
-    count: campaigns.length,
-    categories: new Set(campaigns.map((c) => c.category)).size,
-    fictionalGoals: campaigns.reduce((sum, c) => sum + Math.max(0, c.goal_cents || 0), 0),
-    verifiedSandbox: campaigns.reduce((sum, c) => sum + Math.max(0, c.raised_cents || 0), 0),
-    donors: campaigns.reduce((sum, c) => sum + Math.max(0, c.donor_count || 0), 0),
-  }), [campaigns]);
+  const stats = useMemo(() => summarizeDemoCampaigns(campaigns), [campaigns]);
+  const selectedCampaign = useMemo(
+    () => campaigns.find((c) => c.id === selectedCampaignId)
+      || campaigns.find((c) => c.raised_cents > 0)
+      || campaigns[0],
+    [campaigns, selectedCampaignId],
+  );
+  const fundingSlices = useMemo(() => [
+    { name: "Verified PayPal Sandbox campaign captures", value: stats.verifiedCampaignCents },
+    { name: "Remaining fictional campaign goals", value: stats.remainingGoalCents },
+  ], [stats]);
+  const categorySlices = useMemo(
+    () => stats.categoriesByCount.map(({ category, count }) =>
+      ({ name: labels[category] || category, value: count })),
+    [stats],
+  );
+  const agentSlices = useMemo(
+    () => (agentFocus?.roles || []).map(({ role, units }) =>
+      ({ name: role, value: units })),
+    [agentFocus],
+  );
+
+  useEffect(() => {
+    if (!selectedCampaign?.id) return;
+    let active = true;
+    setFocusLoading(true);
+    setAgentFocus(null);
+    setFocusError("");
+    api<{ focus: AgentFocus }>("/campaigns/" + selectedCampaign.id + "/focus")
+      .then(({ focus }) => {
+        if (active) {
+          if (focus?.simulated !== true || !Array.isArray(focus.roles))
+            throw new Error("Unverified agent focus data");
+          setAgentFocus(focus);
+        }
+      })
+      .catch(() => { if (active) setFocusError("Simulated focus data is temporarily unavailable."); })
+      .finally(() => { if (active) setFocusLoading(false); });
+    return () => { active = false; };
+  }, [selectedCampaign?.id]);
 
   useEffect(() => {
     if (!data || !campaigns.length) return;
@@ -116,9 +155,63 @@ export function CampaignAnalytics() {
         <>
           <div className="stats">
             <article className="panel"><p>Fictional campaigns</p><h2>{stats.count}</h2><small>Published demo records</small></article>
-            <article className="panel"><p>Fictional fundraising goals</p><h2>{money(stats.fictionalGoals)}</h2><small>Target amounts, not donations</small></article>
-            <article className="panel"><p>Verified PayPal Sandbox funding</p><h2>{money(stats.verifiedSandbox)}</h2><small>{stats.donors} recorded provider captures · no real funds</small></article>
+            <article className="panel"><p>Fictional fundraising goals</p><h2>{money(stats.fictionalGoalsCents)}</h2><small>Target amounts, not donations</small></article>
+            <article className="panel"><p>Verified PayPal Sandbox funding</p><h2>{money(stats.verifiedCampaignCents)}</h2><small>{stats.capturedDonationCount} recorded provider captures · no real funds</small></article>
           </div>
+          <section className="partner-chart-section" data-judge="analytics-charts" aria-label="Partner integrations with real AG Charts Community visualizations">
+            <div className="partner-charts-heading">
+              <div>
+                <p className="eyebrow">Partner technology · AG Charts Community</p>
+                <h2>Interactive campaign and agent-focus charts</h2>
+                <p>These donuts are rendered by AG Charts Community, alongside the AG Grid explorer below.
+                  Funding reflects only captured PayPal Sandbox campaign donations.
+                  All campaign goals and agent-focus units are fictional.</p>
+              </div>
+              <Link className="button secondary" to="/map"><Globe2 size={16}/> Explore the interactive Atlas</Link>
+            </div>
+            <div className="partner-charts-grid">
+              <article className="panel partner-chart-card">
+                <p className="eyebrow">AG Charts · Verified sandbox data</p>
+                <h3>Campaign funding versus goals</h3>
+                <Donut
+                  values={fundingSlices}
+                  formatValue={money}
+                  label={money(stats.verifiedCampaignCents) + " provider-verified sandbox campaign funds from " +
+                    money(stats.fictionalGoalsCents) + " in fictional goals"}
+                />
+                <p className="meta">Only provider-verified campaign captures appear as funding.
+                  Platform-support payments and unverified orders are excluded. No real money.</p>
+              </article>
+              <article className="panel partner-chart-card">
+                <p className="eyebrow">AG Charts · Fictional published content</p>
+                <h3>Campaign distribution by cause</h3>
+                <Donut values={categorySlices} label={campaigns.length + " fictional campaigns grouped by category"}/>
+                <p className="meta">Counts represent published fictional campaigns, not contributions or verified donors.</p>
+              </article>
+              <article className="panel partner-chart-card">
+                <p className="eyebrow">AG Charts · Simulated agent attention</p>
+                <h3>Agent focus by role</h3>
+                <label className="partner-focus-select">Choose a fictional campaign
+                  <select value={selectedCampaign?.id || ""} onChange={(event) => setSelectedCampaignId(event.target.value)}>
+                    {campaigns.map((campaign) =>
+                      <option value={campaign.id} key={campaign.id}>{campaign.title}</option>)}
+                  </select>
+                </label>
+                {focusLoading && <p role="status">Loading isolated fictional agent-role allocations…</p>}
+                {focusError && <p role="alert">{focusError}</p>}
+                {agentFocus && (
+                  <>
+                    <Donut values={agentSlices} label={"Simulated agent-role distribution for " + selectedCampaign.title} />
+                    <p><strong>{agentFocus.campaign_units}</strong> simulated attention units on this campaign,
+                      out of <strong>{agentFocus.platform_units}</strong> across the fictional demo.</p>
+                    <Link className="button small secondary" to={"/campaign/" + selectedCampaign.id}>Inspect campaign charts</Link>
+                  </>
+                )}
+                <p className="meta">These are seeded demonstration units only—not time, autonomous work,
+                  deployed agents, or financial expenditures.</p>
+              </article>
+            </div>
+          </section>
           <section className="panel">
             <h2><ChartNoAxesCombined size={22}/> AG Grid Community explorer</h2>
             <p>
