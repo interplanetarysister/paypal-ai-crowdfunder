@@ -4,6 +4,28 @@ export const PAYPAL = "https://api-m.sandbox.paypal.com";
 async function secret(x: DemoEnv["PAYPAL_CLIENT_ID"]) {
   return typeof x === "string" ? x : x?.get();
 }
+// Browser-safe token for PayPal-hosted iframe fields. Never a merchant access token.
+export async function paypalCardClientToken(env: DemoEnv): Promise<string> {
+  demand(env.DEMO_ENABLED === "true", "Sandbox checkout is disabled", 503);
+  const id = await secret(env.PAYPAL_CLIENT_ID);
+  const pass = await secret(env.PAYPAL_CLIENT_SECRET);
+  demand(id && pass, "Sandbox merchant credentials are unavailable", 503);
+  const result = await fetch(PAYPAL + "/v1/oauth2/token", {
+    method: "POST",
+    headers: {
+      authorization: "Basic " + btoa(id + ":" + pass),
+      "content-type": "application/x-www-form-urlencoded",
+    },
+    body: "grant_type=client_credentials&response_type=client_token&intent=sdk_init",
+    signal: AbortSignal.timeout(15000),
+  });
+  demand(result.ok, "PayPal browser-safe card token unavailable", 503, "PAYPAL_UNAVAILABLE");
+  const data = await result.json() as { access_token?: string };
+  demand(typeof data.access_token === "string" && data.access_token.length > 10,
+    "PayPal card session unavailable", 503, "PAYPAL_UNAVAILABLE");
+  return data.access_token;
+}
+
 export async function paypal(env: DemoEnv) {
   demand(
     env.DEMO_ENABLED === "true",
