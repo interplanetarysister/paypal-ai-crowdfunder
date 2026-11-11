@@ -34,6 +34,7 @@ import {
 } from "./pages";
 import { Wizard } from "./wizard";
 import { Dashboard, Showcase, Tracker } from "./workspace";
+import { CampaignAnalytics } from "./analytics";
 import "./style.css";
 import { Session, Brand, ErrorBox, Notice, Protected, useSession } from "./ui";
 function Login() {
@@ -252,6 +253,7 @@ function App() {
             }
           />
           <Route path="/hackathon" element={<Showcase />} />
+          <Route path="/hackathon/analytics" element={<CampaignAnalytics />} />
           <Route
             path="/hackathon/tracker"
             element={
