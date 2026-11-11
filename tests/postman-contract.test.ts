@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
 const collection = JSON.parse(readFileSync(new URL("../postman/IFund_PayPal_AI_Sandbox.postman_collection.json", import.meta.url), "utf8"));
-const items = collection.item as Array<{name:string;request:{method:string;url:{raw:string;path:string[]};body?:{raw:string}};event?:Array<{script:{exec:string[]}}>}>;
+const items = collection.item as Array<{name:string;request:{method:string;description?:string;url:{raw:string;path:string[]};body?:{raw:string}};event?:Array<{script:{exec:string[]}}>}>;
 const names = items.map(x=>x.name);
 
 test("public Postman collection is runnable against dedicated sandbox origin and covers core integration", () => {
