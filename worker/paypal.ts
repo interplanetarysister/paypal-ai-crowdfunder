@@ -1,5 +1,6 @@
 import { demand, Fault, providerId, now, type DB } from "./core.ts";
 import type { DemoEnv, Order, ProviderOrder } from "./types.ts";
+import { mayCaptureSandboxCard } from "../src/sandbox-liability";
 export const PAYPAL = "https://api-m.sandbox.paypal.com";
 async function secret(x: DemoEnv["PAYPAL_CLIENT_ID"]) {
   return typeof x === "string" ? x : x?.get();
@@ -71,7 +72,11 @@ export async function paypal(env: DemoEnv) {
     payload?: unknown,
     key?: string,
   ): Promise<T> => {
-    demand(/^\/v[12]\/[a-z0-9_/-]+$/i.test(path), "Unsafe PayPal path", 500);
+    demand(
+      /^\/v[12]\/[a-z0-9_/-]+(?:\?fields=payment_source)?$/i.test(path),
+      "Unsafe PayPal path",
+      500,
+    );
     const response = await fetch(PAYPAL + path, {
       method,
       headers: {
@@ -192,6 +197,20 @@ export async function reconcile(
   );
   verifyOrder(remote, record, record.merchant_id || env.PAYPAL_MERCHANT_ID!);
   if (capture && remote.status === "APPROVED") {
+    if (record.checkout_method === "card") {
+      // Only query PayPal for 3DS risk data; never copy raw card data into our DB.
+      const authentication = await api<ProviderOrder>("GET", path + "?fields=payment_source");
+      const threeDS = authentication.payment_source?.card?.authentication_result;
+      demand(
+        mayCaptureSandboxCard(
+          threeDS?.liability_shift,
+          threeDS?.three_d_secure?.enrollment_status,
+        ),
+        "PayPal 3-D Secure outcome does not permit capture; use another sandbox test card",
+        409,
+        "3DS_NOT_VERIFIED",
+      );
+    }
     try {
       await api<ProviderOrder>(
         "POST",
