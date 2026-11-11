@@ -5,6 +5,10 @@ An independent IFund demonstration with fictional campaigns, a real-model campai
 This repository evolves the earlier local Crowdfunder demo into the IFund visual experience. The old implementation remains available in Git history; it is not the active deployed runtime. GitHub's connected integration could not create another repository, so this already separate public demo repository is reused. Production repositories are unchanged.
 
 - Judge walkthrough: `/hackathon` on the verified deployment listed in [RELEASE.md](docs/RELEASE.md).
+- **Real judge entry:** https://ifund-hackathon-demo.interplanetary-fund.workers.dev/hackathon
+- **AG Charts + AG Grid partner dashboard:** https://ifund-hackathon-demo.interplanetary-fund.workers.dev/hackathon/analytic
+- **Postman sandbox API tests:** [importable collection](postman/IFund_PayPal_AI_Sandbox.postman_collection.json) (no secrets or card numbers).
+- **Final implementation and compliance gates:** [REMAINING_HACKATHON_PLAN.md](docs/REMAINING_HACKATHON_PLAN.md) and [RELEASE.md](docs/RELEASE.md).
 - Existing submitted entry: https://devpost.com/software/interplanetary-fund-5pznwy
 - Existing public video: https://www.youtube.com/watch?v=HkxIFqoEKs0 — approximately two minutes; coverage of this standalone sandbox release requires separate verification.
 - Official rules: https://paypalaihackathon.devpost.com/rules
@@ -61,11 +65,11 @@ The manual deployment workflow only targets `ifund-hackathon-demo`. It requires 
 
 The browser selects an amount from a validated $1–$100 range. The server pins that amount, purpose, campaign and idempotency key before creating the PayPal order. The sandbox provider's merchant is pinned from an authenticated order GET. Capture validates order, merchant, currency, amount, reference and completed capture. One Postgres transaction writes the immutable capture, balanced ledger and receipt. Webhooks are signature-verified through PayPal and deduplicated by event ID. Capture persistence does not wait for a webhook.
 
-Pending, cancelled, failed and unverified requests are not collected funds. Platform support has a null campaign relationship and separate ledger account. Subscriptions, advanced card fields, Venmo and social publishing are unavailable. PayPal determines eligible sandbox checkout methods. The 7% withdrawal fee is a labeled arithmetic preview; no payout endpoint exists.
+Pending, cancelled, failed and unverified requests are not collected funds. Platform support has a null campaign relationship and separate ledger account. Subscriptions, guaranteed Card Fields eligibility, Venmo and automatic social publishing are unavailable. PayPal SDK v6 hosted Card Fields are implemented but only display when the Sandbox merchant qualifies, and no card-funded provider acceptance is yet verified. PayPal determines eligible sandbox checkout methods. The 7% withdrawal fee is a labeled arithmetic preview; no payout endpoint exists.
 
 ## Judge instructions and compliance
 
-Read [JUDGE_TESTING.md](docs/JUDGE_TESTING.md), [COMPLIANCE.md](docs/COMPLIANCE.md), [VIDEO.md](docs/VIDEO.md) and the dated [release evidence](docs/RELEASE.md). This source is not a certification of eligibility or completed provider testing. The existing Devpost submission is preserved until a reviewed update is authorized and verified.
+Read [JUDGE_TESTING.md](docs/JUDGE_TESTING.md), [COMPLIANCE.md](docs/COMPLIANCE.md), [VIDEO.md](docs/VIDEO.md) and the dated [release evidence](docs/RELEASE.md). This source is not a certification of eligibility or completed provider testing. The existing Devpost entry has been updated with the dedicated guided demo and partner chart links. Check the live project and submission fields for accurate video, working-demo URL and honest provider evidence.
 
 ## Judge charts and interactive globe (free-tier implementation)
 
@@ -76,7 +80,7 @@ Read [JUDGE_TESTING.md](docs/JUDGE_TESTING.md), [COMPLIANCE.md](docs/COMPLIANCE.
 - **Security:** migration `db/004_simulated_agent_focus.sql` enables RLS, revokes browser grants and grants `service_role` only; read access is through the existing signed demo data Edge gateway. The live site is a separate Worker and does not write to production finance tables.
 - **Testing:** `tests/payments.test.ts` verifies the new focus endpoint does not modify ledger totals and that anonymous direct database access is denied.
 
-The demo is intentionally self-contained apart from its already configured Supabase, Cloudflare and PayPal Sandbox integrations. The AG Charts CDN dependency needs network access; the fallback remains readable without it.
+The independent demo is intentionally self-contained apart from its already configured Supabase, Cloudflare and PayPal Sandbox integrations. The AG Charts CDN dependency needs network access; the fallback remains readable without it.
 
 ## PayPal Sandbox test-card checkout (2026-11-11)
 
