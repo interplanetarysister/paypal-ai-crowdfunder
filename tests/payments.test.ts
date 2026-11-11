@@ -326,3 +326,33 @@ test("mocked provider: pending, failures, cancellation and platform support neve
   assert(h.apiCalls.every((p) => !p.includes("payout")));
   assert(origin.startsWith("https"));
 });
+
+test("fictional campaign focus exposes simulated allocations without changing payment totals", async (t) => {
+  const h = await harness();
+  t.after(() => h.close());
+  const c = await h.campaign();
+  const response = await h.call("/campaigns/" + c.id + "/focus");
+  assert.equal(response.status, 200, await response.clone().text());
+  const body = (await response.json()) as { focus: {
+    simulated: boolean; campaign_units: number; platform_units: number;
+    roles: { role: string; units: number }[];
+  } };
+  assert.equal(body.focus.simulated, true);
+  assert.equal(body.focus.roles.length, 4);
+  assert.equal(body.focus.campaign_units, body.focus.roles.reduce((n, r) => n + r.units, 0));
+  assert(body.focus.platform_units >= body.focus.campaign_units);
+  assert.equal(
+    (await h.call("/campaigns/00000000-0000-4000-8000-000000000000/focus")).status,
+    404,
+  );
+  const finance = (await (await h.call("/campaigns/" + c.id)).json()) as {
+    campaign: { raised_cents: number; donor_count: number };
+  };
+  assert.equal(finance.campaign.raised_cents, 0);
+  assert.equal(finance.campaign.donor_count, 0);
+  const grants = await h.pg.query<{ anon_select: boolean; anon_execute: boolean }>(
+    "select has_table_privilege('anon','public.ifund_demo_agent_focus','select') as anon_select, has_function_privilege('anon','public.ifund_demo_campaign_focus(uuid)','execute') as anon_execute",
+  );
+  assert.equal(grants.rows[0].anon_select, false);
+  assert.equal(grants.rows[0].anon_execute, false);
+});
