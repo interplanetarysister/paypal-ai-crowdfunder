@@ -312,8 +312,18 @@ export function Showcase() {
           <code>{status?.release_sha || (statusError ? "STATUS UNAVAILABLE" : "Checking…")}</code>
         </p>
         <p>
-          Provider-backed acceptance: <strong>NOT VERIFIED</strong>. See the
-          repository release report for dated evidence.
+          Provider-backed acceptance:{" "}
+          <strong>
+            {statusError
+              ? "Status unavailable — check release evidence"
+              : !status
+                ? "Checking…"
+                : status.provider_acceptance ===
+                    "PROVIDER_CAPTURE_AND_SIGNATURE_VERIFIED__FULL_BUYER_REPLAY_PENDING"
+                  ? "Sandbox capture and signature verified; fresh buyer/replay acceptance pending"
+                  : "Full provider acceptance not yet verified"}
+          </strong>
+          . See the repository release report for dated evidence.
         </p>
       </section>
       <section className="story-section compact">
