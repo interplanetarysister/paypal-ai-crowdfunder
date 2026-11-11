@@ -2,6 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { harness, origin } from "./harness.ts";
 import { verifyOrder, approvalUrl } from "../worker/paypal.ts";
+import { mayCaptureSandboxCard } from "../src/sandbox-liability";
 import type { Order, ProviderOrder } from "../worker/types.ts";
 const fixture: Order = {
   id: "7b69009e-b66a-445e-8c43-147df51f2b0c",
@@ -393,6 +394,19 @@ test("sandbox Card Fields: token, method isolation, approval, capture and exactl
   assert.equal((await h.call("/paypal/orders/" + order.id + "/capture", "POST", {})).status, 409);
   const mockProvider = h.providerOrders.get(order.paypal_order_id)!;
   mockProvider.status = "APPROVED";
+  // The provider's 3DS response is authoritative. A failed challenge is never captured.
+  mockProvider.payment_source = {
+    card: { authentication_result: {
+      liability_shift: "NO",
+      three_d_secure: { enrollment_status: "Y", authentication_status: "N" },
+    } },
+  };
+  assert.equal((await h.call("/paypal/orders/" + order.id + "/capture", "POST", {})).status, 409);
+  mockProvider.payment_source.card!.authentication_result!.liability_shift = "UNKNOWN";
+  assert.equal((await h.call("/paypal/orders/" + order.id + "/capture", "POST", {})).status, 409);
+  assert.equal(h.captureCalls, 0);
+  mockProvider.payment_source.card!.authentication_result!.liability_shift = "POSSIBLE";
+  mockProvider.payment_source.card!.authentication_result!.three_d_secure!.authentication_status = "Y";
   const capture = await h.call("/paypal/orders/" + order.id + "/capture", "POST", {});
   assert.equal(capture.status, 200, await capture.clone().text());
   const result = await capture.json() as { status: string; capture_id: string; receipt_id: string };
@@ -406,4 +420,14 @@ test("sandbox Card Fields: token, method isolation, approval, capture and exactl
   assert.deepEqual(balance.rows, [{ n: 2, total: 0 }]);
   assert.equal((await h.pg.query("select * from public.ifund_demo_receipts")).rows.length, 1);
   assert.equal((await h.pg.query<{ checkout_method: string }>("select checkout_method from public.ifund_demo_orders")).rows[0].checkout_method, "card");
+});
+
+test("PayPal 3DS policy recognizes issuer approval and blocks failed or unknown challenges", () => {
+  assert.equal(mayCaptureSandboxCard(undefined), true); // 3DS was not required
+  assert.equal(mayCaptureSandboxCard("POSSIBLE", "Y"), true);
+  assert.equal(mayCaptureSandboxCard("NO", "Y"), false);
+  assert.equal(mayCaptureSandboxCard("UNKNOWN", "Y"), false);
+  assert.equal(mayCaptureSandboxCard("NO", "N"), true); // issuer not enrolled
+  assert.equal(mayCaptureSandboxCard("NO", "B"), true); // bank bypass
+  assert.equal(mayCaptureSandboxCard("INVALID", "Y"), false);
 });
