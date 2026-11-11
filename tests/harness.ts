@@ -19,6 +19,9 @@ export async function harness() {
       "utf8",
     ),
   );
+  await pg.exec(
+    await readFile(new URL("../db/004_simulated_agent_focus.sql", import.meta.url), "utf8"),
+  );
   let signed = true,
     failProvider = false,
     failAI = false,
