@@ -268,6 +268,9 @@ export function Showcase() {
           <Link className="button secondary" to="/discover">
             Explore the demo <ArrowRight size={17} />
           </Link>
+          <Link className="button secondary" to="/hackathon/analytics">
+            <Code2 size={17}/> Explore AG Grid analytics
+          </Link>
         </div>
       </header>
       <Notice>
