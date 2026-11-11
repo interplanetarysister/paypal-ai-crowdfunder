@@ -1619,3 +1619,14 @@ footer .brand small {
   .finance-grid-shell { max-width: calc(100vw - 26px); }
   .finance-accessible-history { padding: 12px; }
 }
+
+/* Public AG Grid Community campaign explorer, no premium features or private data. */
+.public-analytics-grid { width: 100%; max-width: 100%; min-height: 220px; overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; }
+.public-ag-grid { width: 100%; min-width: 920px; min-height: 220px; }
+.public-analytics-fallback { padding: 12px 0 0 22px; margin: 0; }
+.public-analytics-fallback li { padding: 8px 0; border-bottom: 1px solid var(--border); }
+.public-analytics-fallback li span { color: var(--muted); display: block; font-size: 0.87rem; }
+@media (max-width: 760px) {
+  .public-analytics-grid { max-width: calc(100vw - 36px); }
+  .public-ag-grid { min-width: 780px; }
+}
