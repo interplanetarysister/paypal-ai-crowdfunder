@@ -330,6 +330,7 @@ test("mocked provider: pending, failures, cancellation and platform support neve
 test("fictional campaign focus exposes simulated allocations without changing payment totals", async (t) => {
   const h = await harness();
   t.after(() => h.close());
+  await h.register();
   const c = await h.campaign();
   const response = await h.call("/campaigns/" + c.id + "/focus");
   assert.equal(response.status, 200, await response.clone().text());
