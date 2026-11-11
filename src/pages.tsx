@@ -240,7 +240,7 @@ export function Discovery({ map = false }: { map?: boolean }) {
       </div>
       <ErrorBox error={error} />
       {loading && <p role="status">Discovering campaigns…</p>}
-      {map && <CampaignGlobe campaigns={campaigns} />}
+      {map && <div data-judge="atlas-globe"><CampaignGlobe campaigns={campaigns} /></div>}
       {!loading && !error && (
         <p className="meta" role="status">
           {campaigns.length} fictional{" "}
@@ -336,7 +336,7 @@ export function Details() {
                 />
               </div>
               <p>{c.donor_count || 0} demo donors</p>
-              <Link className="button paypal" to={"/checkout?campaign=" + c.id}>
+              <Link data-judge="sandbox-donate" className="button paypal" to={"/checkout?campaign=" + c.id}>
                 Donate with PayPal Sandbox
               </Link>
               <Link className="button secondary" to={"/share/" + c.id}>
@@ -355,7 +355,7 @@ export function Details() {
               )}
             </aside>
           </div>
-          <CampaignCharts campaign={c} />
+          <div data-judge="campaign-charts"><CampaignCharts campaign={c} /></div>
         </>
       )}
     </>
