@@ -239,7 +239,7 @@ export function Dashboard() {
   );
 }
 export function Showcase() {
-  const { status } = useSession();
+  const { status, statusError } = useSession();
   return (
     <>
       <header className="showcase-heading">
@@ -284,16 +284,21 @@ export function Showcase() {
             <div key={String(label)}>
               <span>{label}</span>
               <strong>
-                {configured
-                  ? "Configured · NOT VERIFIED"
-                  : "Unavailable / not configured"}
+                {statusError
+                  ? "Status check failed"
+                  : !status
+                    ? "Checking live configuration…"
+                    : configured
+                      ? "Connected · check provider evidence"
+                      : "Unavailable / not configured"}
               </strong>
             </div>
           ))}
         </div>
+        {statusError && <p role="alert">{statusError}</p>}
         <p>
           Deployment commit:{" "}
-          <code>{status?.release_sha || "NOT VERIFIED"}</code>
+          <code>{status?.release_sha || (statusError ? "STATUS UNAVAILABLE" : "Checking…")}</code>
         </p>
         <p>
           Provider-backed acceptance: <strong>NOT VERIFIED</strong>. See the
