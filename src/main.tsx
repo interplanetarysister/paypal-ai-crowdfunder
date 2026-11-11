@@ -4,6 +4,7 @@ import {
   BrowserRouter,
   Link,
   NavLink,
+  Navigate,
   Route,
   Routes,
   useLocation,
@@ -255,6 +256,7 @@ function App() {
           />
           <Route path="/hackathon" element={<Showcase />} />
           <Route path="/hackathon/analytics" element={<CampaignAnalytics />} />
+          <Route path="/hackathon/analytic" element={<Navigate to="/hackathon/analytics" replace />} />
           <Route
             path="/hackathon/tracker"
             element={
