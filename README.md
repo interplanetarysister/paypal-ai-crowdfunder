@@ -110,3 +110,16 @@ Automated tests include three distinct **mock-provider** card-funded contributio
 The guided entry page at `/hackathon` now links directly to `/hackathon/analytics`. This public read-only view reuses AG Grid Community and the existing `GET /api/campaigns` endpoint to show each of the populated fictional campaigns without requiring judges to register or run PayPal. Judges can filter/sort category, title, synthetic location, **fictional goal**, **verified PayPal Sandbox captured amount**, percentage and provider capture count, then open the campaign for the AG Charts Community funding and simulated agent-focus donuts or interactive globe.
 
 No new financial tables, fake donation receipts, paid AG Grid/Charts Enterprise features, or privileged API endpoints were added for the view. The separate `/dashboard` financial grid remains owner-scoped and requires a demo account. These values must never be presented as real donations.
+
+
+## Judge analytics route and partner visualizations
+
+- **Primary judge URL:** https://ifund-hackathon-demo.interplanetary-fund.workers.dev/hackathon
+- **Partner graph showcase:** https://ifund-hackathon-demo.interplanetary-fund.workers.dev/hackathon/analytics
+- **Compatible judge link:** https://ifund-hackathon-demo.interplanetary-fund.workers.dev/hackathon/analytic (redirects to the full analytics view)
+- **AG Charts Community (free):** real-rendered aggregate fundraising-versus-fictional-goal donut, published-campaign categories donut, and an interactive per-campaign **simulated** agent-role donut. Choose one of the public fictional campaigns in the agent-focus selector. The role units are recorded only in the isolated demo database and are **not actual agent work, billable activity, or donations**.
+- **AG Grid Community (free):** sortable/filterable table of public fictional campaigns, with separate provider-verified PayPal Sandbox captures and fictional goal columns, plus a keyboard-accessible text fallback.
+- **Atlas:** https://ifund-hackathon-demo.interplanetary-fund.workers.dev/map (interactive, synthetic map markers; no paid AG Charts Enterprise maps).
+- The dashboard uses only the public campaign API plus one isolated, read-only per-campaign focus RPC. It never exposes payment credentials, donors, private receipts, or a production database. No fake financial transactions are created by the graphs.
+
+The guided walkthrough highlights the charts and grid in distinct steps. This is an educational sandbox demonstration, not evidence of live processing of credit-card payments. Test scripts verify no unverified/negative/fictional money is added to the captured totals.
