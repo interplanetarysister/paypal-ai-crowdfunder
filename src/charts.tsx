@@ -35,7 +35,7 @@ interface Segment {
   value: number;
 }
 
-function Donut({ values, label }: { values: Segment[]; label: string }) {
+export function Donut({ values, label, formatValue = (value: number) => value.toLocaleString("en-US") }: { values: Segment[]; label: string; formatValue?: (value: number) => string }) {
   const element = useRef<HTMLDivElement | null>(null);
   const [error, setError] = useState("");
   const chartValues = useMemo(() => values.filter((value) => value.value > 0), [values]);
@@ -72,7 +72,7 @@ function Donut({ values, label }: { values: Segment[]; label: string }) {
       <div ref={element} role="img" aria-label={label} className="demo-chart-canvas" />
       {error && <p className="meta" role="status">Chart unavailable: {error}. Data remains accessible below.</p>}
       <ul className="chart-values">
-        {values.map(({ name, value }) => <li key={name}><span>{name}</span><strong>{value.toLocaleString("en-US")}</strong></li>)}
+        {values.map(({ name, value }) => <li key={name}><span>{name}</span><strong>{formatValue(value)}</strong></li>)}
       </ul>
     </div>
   );
@@ -114,7 +114,7 @@ export function CampaignCharts({ campaign }: { campaign: Campaign }) {
       <article className="panel">
         <p className="eyebrow">AG Charts Community · PayPal Sandbox</p>
         <h2>Fundraising progress</h2>
-        <Donut values={funding} label={money(received) + " verified sandbox contributions; " + money(outstanding) + " remaining fictional goal"} />
+        <Donut values={funding} formatValue={money} label={money(received) + " verified sandbox contributions; " + money(outstanding) + " remaining fictional goal"} />
         <p><strong>{money(received)}</strong> verified from a {money(campaign.goal_cents)} fictional goal.</p>
         <p className="meta">Only PayPal provider-verified captures are counted. No real funds, seeded donations or withdrawals.</p>
       </article>
