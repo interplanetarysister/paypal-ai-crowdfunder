@@ -20,7 +20,7 @@ import {
   providerId,
   type DB,
 } from "./core.ts";
-import { approvalUrl, paypal, reconcile, verifyWebhook } from "./paypal.ts";
+import { approvalUrl, paypal, paypalCardClientToken, reconcile, verifyWebhook } from "./paypal.ts";
 import { generate } from "./ai.ts";
 import {
   campaignInput,
@@ -44,7 +44,7 @@ export async function handle(
     headers.set("referrer-policy", "same-origin");
     headers.set(
       "content-security-policy",
-      "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; connect-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'",
+      "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://www.sandbox.paypal.com https://sandbox.paypal.com https://www.paypal.com; connect-src 'self' https://*.paypal.com https://*.paypalobjects.com; img-src 'self' data: blob: https://*.paypal.com https://*.paypalobjects.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src 'self' https://*.paypal.com; object-src 'none'; base-uri 'self'; form-action 'self' https://*.paypal.com; frame-ancestors 'self'",
     );
     if (!path.startsWith("/embed/"))
       headers.set("x-frame-options", "SAMEORIGIN");
@@ -262,6 +262,12 @@ export async function handle(
           "x-content-type-options": "nosniff",
         },
       });
+    }
+    if (path === "/api/paypal/browser-token" && request.method === "GET") {
+      const actor = requireUser(user);
+      await limit(db, "card-token:" + actor.id, 15, 3600);
+      const clientToken = await paypalCardClientToken(env);
+      return json({ clientToken }, 200, { "cache-control": "no-store" });
     }
     if (path === "/api/paypal/status" && request.method === "GET") {
       const actor = requireUser(user);
@@ -514,6 +520,8 @@ export async function handle(
 
 async function createOrder(request: Request, env: DemoEnv, db: DB, user: User) {
   const input = await body(request);
+  const method = input.checkout_method === undefined ? "paypal" : input.checkout_method;
+  demand(method === "paypal" || method === "card", "Invalid sandbox checkout method");
   demand(uuid(input.key), "A checkout idempotency key is required");
   demand(
     input.purpose === "campaign" || input.purpose === "platform_support",
@@ -552,6 +560,7 @@ async function createOrder(request: Request, env: DemoEnv, db: DB, user: User) {
         create_key: input.key,
         purpose: input.purpose,
         campaign_id: input.campaign_id,
+        checkout_method: method,
         amount_cents: input.amount_cents,
       });
     } catch (e) {
@@ -564,15 +573,19 @@ async function createOrder(request: Request, env: DemoEnv, db: DB, user: User) {
   demand(
     record.purpose === input.purpose &&
       record.campaign_id === input.campaign_id &&
-      record.amount_cents === input.amount_cents,
+      record.amount_cents === input.amount_cents &&
+      (record.checkout_method || "paypal") === method,
     "This checkout key is bound to another amount or purpose",
     409,
   );
-  if (record.approval_url)
+  // An existing card intent never creates a second PayPal order on retry.
+  if (record.paypal_order_id)
     return json({
       id: record.id,
+      paypal_order_id: record.paypal_order_id,
       approval_url: record.approval_url,
       status: record.status,
+      checkout_method: method,
     });
   const api = await paypal(env);
   demand(env.PAYPAL_WEBHOOK_ID, "Sandbox webhook is not configured", 503);
@@ -608,24 +621,22 @@ async function createOrder(request: Request, env: DemoEnv, db: DB, user: User) {
           },
         },
       ],
-      payment_source: {
-        paypal: {
-          experience_context: {
-            brand_name: "Interplanetary Fund Sandbox",
-            user_action: "PAY_NOW",
-            return_url:
-              env.DEMO_ORIGIN +
-              "/checkout?id=" +
-              record.id +
-              "&paypal=approved",
-            cancel_url:
-              env.DEMO_ORIGIN +
-              "/checkout?id=" +
-              record.id +
-              "&paypal=cancelled",
-          },
-        },
-      },
+      ...(method === "paypal"
+        ? {
+            payment_source: {
+              paypal: {
+                experience_context: {
+                  brand_name: "Interplanetary Fund Sandbox",
+                  user_action: "PAY_NOW",
+                  return_url:
+                    env.DEMO_ORIGIN + "/checkout?id=" + record.id + "&paypal=approved",
+                  cancel_url:
+                    env.DEMO_ORIGIN + "/checkout?id=" + record.id + "&paypal=cancelled",
+                },
+              },
+            },
+          }
+        : {}),
     },
     "ifund-demo-create-" + record.id,
   );
@@ -637,7 +648,7 @@ async function createOrder(request: Request, env: DemoEnv, db: DB, user: User) {
     "PayPal order creation not confirmed",
     502,
   );
-  const url = approvalUrl(remote);
+  const url = method === "paypal" ? approvalUrl(remote) : null;
   const detailed = await api<ProviderOrder>(
     "GET",
     "/v2/checkout/orders/" + remote.id,
@@ -674,6 +685,7 @@ async function createOrder(request: Request, env: DemoEnv, db: DB, user: User) {
       id: record.id,
       paypal_order_id: remote.id,
       approval_url: url,
+      checkout_method: method,
       status: "created",
     },
     201,
