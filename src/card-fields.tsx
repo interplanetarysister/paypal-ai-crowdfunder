@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { api, post, money } from "./api";
+import { mayCaptureSandboxCard } from "./sandbox-liability";
 
 // Card numbers, expiry and CVV are entered ONLY in PayPal-hosted iframes.
 // Do not add inputs, logging, telemetry, test fixtures or backend fields for PAN/CVV.
@@ -10,7 +11,7 @@ interface CardSession {
   }): HTMLElement;
   submit(orderId: string, options: { billingAddress: { postalCode: string } }): Promise<{
     state: "succeeded" | "failed" | "canceled" | string;
-    data?: { orderId?: string; message?: string };
+    data?: { orderId?: string; message?: string; liabilityShift?: string };
   }>;
 }
 interface SdkInstance {
@@ -193,6 +194,13 @@ export function SandboxCardFields({
       } else if (outcome.state === "succeeded") {
         if (outcome.data?.orderId && outcome.data.orderId !== order.paypal_order_id)
           throw Error("PayPal returned an unexpected order association");
+        if (!mayCaptureSandboxCard(outcome.data?.liabilityShift)) {
+          // PayPal reports a rejected or unavailable 3DS challenge. Start fresh.
+          sessionStorage.removeItem("ifund-card-checkout-intent");
+          setPendingOrder(null);
+          setError("The sandbox issuer authentication did not meet the required 3-D Secure protection. No donation was collected.");
+          return;
+        }
         await capture(order.id);
       } else {
         setInfo("PayPal did not confirm payment. Nothing was credited.");
