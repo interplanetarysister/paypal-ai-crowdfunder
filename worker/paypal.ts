@@ -1,6 +1,6 @@
 import { demand, Fault, providerId, now, type DB } from "./core.ts";
 import type { DemoEnv, Order, ProviderOrder } from "./types.ts";
-import { mayCaptureSandboxCard } from "../src/sandbox-liability";
+import { mayCaptureSandboxCard } from "../src/sandbox-liability.ts";
 export const PAYPAL = "https://api-m.sandbox.paypal.com";
 async function secret(x: DemoEnv["PAYPAL_CLIENT_ID"]) {
   return typeof x === "string" ? x : x?.get();
