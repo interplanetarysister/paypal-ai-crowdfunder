@@ -115,7 +115,7 @@ export function Dashboard() {
               </div>
             ) : (
               <>
-                <FinanceGrid orders={data.orders} receipts={data.receipts} />
+                <div data-judge="finance-grid"><FinanceGrid orders={data.orders} receipts={data.receipts} /></div>
                 <details className="finance-accessible-history">
                   <summary>Accessible transaction list with receipt and reconciliation links</summary>
               <div className="transaction-list">
