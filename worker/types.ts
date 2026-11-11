@@ -64,6 +64,14 @@ export interface Order {
   captured_at?: string;
 }
 export interface ProviderOrder {
+  payment_source?: {
+    card?: {
+      authentication_result?: {
+        liability_shift?: string;
+        three_d_secure?: { enrollment_status?: string; authentication_status?: string };
+      };
+    };
+  };
   id?: string;
   status?: string;
   links?: { rel: string; href: string }[];
