@@ -249,7 +249,7 @@ export function Showcase() {
   const { status, statusError } = useSession();
   return (
     <>
-      <header className="showcase-heading">
+      <header className="showcase-heading" data-judge="judge-guide">
         <p className="eyebrow">PayPal AI Hackathon · 2026</p>
         <h1>
           From “What if?”
@@ -261,16 +261,17 @@ export function Showcase() {
           contribution from buyer approval to a canonical receipt.
         </p>
         <div className="actions center">
-          <Link className="button" to="/create">
+          <Link className="button" data-judge="create-link" to="/create">
             <Sparkles size={17} />
             Create a fictional campaign
           </Link>
           <Link className="button secondary" to="/discover">
             Explore the demo <ArrowRight size={17} />
           </Link>
-          <Link className="button secondary" to="/hackathon/analytics">
+          <Link className="button secondary" data-judge="analytics-link" to="/hackathon/analytics">
             <Code2 size={17}/> Explore AG Grid analytics
           </Link>
+          <button type="button" className="button judge-start" onClick={() => window.dispatchEvent(new Event("ifund-start-judge-tour"))}>Start the guided, highlighted tour</button>
         </div>
       </header>
       <Notice>
