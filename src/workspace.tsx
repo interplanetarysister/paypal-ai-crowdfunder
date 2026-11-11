@@ -269,7 +269,7 @@ export function Showcase() {
             Explore the demo <ArrowRight size={17} />
           </Link>
           <Link className="button secondary" data-judge="analytics-link" to="/hackathon/analytics">
-            <Code2 size={17}/> Explore AG Grid analytics
+            <Code2 size={17}/> View AG Charts & AG Grid partner demo
           </Link>
           <button type="button" className="button judge-start" onClick={() => window.dispatchEvent(new Event("ifund-start-judge-tour"))}>Start the guided, highlighted tour</button>
         </div>
