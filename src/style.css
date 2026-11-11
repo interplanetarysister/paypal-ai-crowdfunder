@@ -1601,6 +1601,7 @@ footer .brand small {
 .sandbox-card-section { margin-top: 24px; border-top: 1px solid var(--border); padding-top: 22px; }
 .sandbox-card-section h2 { font-size: clamp(19px, 2.5vw, 25px); }
 .sandbox-card-inputs { display: grid; gap: 12px; }
+.sandbox-card-inputs[hidden] { display: none; }
 .sandbox-card-inputs label { margin-bottom: 4px; }
 .paypal-card-frame { margin-top: 7px; height: 52px; min-width: 0; border: 1px solid #b4c4d9; border-radius: 10px; overflow: hidden; background: white; }
 .paypal-card-frame iframe { border: 0; width: 100%; min-height: 50px; }
