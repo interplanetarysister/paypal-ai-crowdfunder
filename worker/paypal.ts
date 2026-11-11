@@ -60,7 +60,9 @@ export async function paypal(env: DemoEnv) {
       ...(payload === undefined ? {} : { body: JSON.stringify(payload) }),
       signal: AbortSignal.timeout(20000),
     });
-    const data = (await response.json()) as T;
+    const data = (
+      response.status === 204 ? { accepted: true } : await response.json()
+    ) as T;
     if (!response.ok) {
       const detail = data as { details?: { issue?: string }[] };
       const code = detail?.details?.[0]?.issue;

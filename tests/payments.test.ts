@@ -177,6 +177,10 @@ test("mocked provider integration: approval, capture, ledger, receipt, reconcili
     await h.call("/paypal/webhook", "POST", event, headers)
   ).json()) as { duplicate: boolean };
   assert.equal(replay.duplicate, true);
+  const delivered = await h.pg.query<{ delivery_count: number }>(
+    "select delivery_count from ifund_demo_events",
+  );
+  assert.equal(delivered.rows[0].delivery_count, 2);
   assert.equal(
     (await h.pg.query("select * from ifund_demo_events")).rows.length,
     1,

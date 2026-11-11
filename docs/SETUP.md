@@ -4,7 +4,7 @@ Use only free allocations. Do not enable a paid subscription or change productio
 
 ## Data
 
-Apply `db/001_demo.sql` and `db/002_fictional_campaigns.sql` to your own Supabase database. All twelve demo tables have RLS enabled; anon/authenticated grants are revoked. RPCs are executable only by service_role and use SECURITY INVOKER. Seed accounts cannot log in; no financial successes are seeded.
+Apply `db/001_demo.sql`, `db/002_fictional_campaigns.sql` and `db/003_verified_webhook_replay.sql` to your own Supabase database. All twelve demo tables have RLS enabled; anon/authenticated grants are revoked. RPCs are executable only by service_role and use SECURITY INVOKER. Seed accounts cannot log in; no financial successes are seeded.
 
 For the existing owner deployment, a new free Supabase project was refused because the organization already has two free projects. Only the new `ifund_demo_*` tables in `ssibsfmtodgximseeqsv` are used. Demo account creation never touches `auth.users`. The application has no route to production financial tables.
 

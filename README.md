@@ -17,7 +17,7 @@ This repository evolves the earlier local Crowdfunder demo into the IFund visual
 - Supabase: **only `ifund_demo_*` tables**, all with RLS and revoked direct browser grants. No production Auth identities are created. Demo identities are fictional handles with salted PBKDF2 passwords and opaque HttpOnly session cookies.
 - Dedicated R2 bucket for uploads and generated artwork.
 - Dedicated Supabase Edge gateway authenticated with a separate demo ECDSA key. Database service credentials stay inside Supabase. A direct server-only Supabase key is also supported for local setup.
-- AI text model: `@cf/meta/llama-3.1-8b-instruct`; artwork: `@cf/black-forest-labs/flux-1-schnell`. No canned successful fallback.
+- AI text model: `@cf/meta/llama-3.3-70b-instruct-fp8-fast`; artwork: `@cf/black-forest-labs/flux-1-schnell`. No canned successful fallback.
 
 ## Run and verify locally
 
@@ -32,7 +32,7 @@ npm run test:browser
 
 Tests use a real local PostgreSQL engine (PGlite) and explicitly mocked provider responses. They never establish real PayPal or AI acceptance. The application bundle imports none of the test provider code.
 
-For a configured local environment, copy `.env.example` to **`.dev.vars`** (ignored), configure your own Supabase server key and sandbox credentials, set `DEMO_ORIGIN=http://localhost:8787`, and apply `db/001_demo.sql` and optionally `db/002_fictional_campaigns.sql` to an isolated database. Use the same browser hostname throughout. Local PayPal return/webhook testing requires a securely configured public HTTPS demo origin; localhost cannot receive public PayPal webhooks.
+For a configured local environment, copy `.env.example` to **`.dev.vars`** (ignored), configure your own Supabase server key and sandbox credentials, set `DEMO_ORIGIN=http://localhost:8787`, and apply `db/001_demo.sql` and `db/003_verified_webhook_replay.sql`, and optionally `db/002_fictional_campaigns.sql` to an isolated database. Use the same browser hostname throughout. Local PayPal return/webhook testing requires a securely configured public HTTPS demo origin; localhost cannot receive public PayPal webhooks.
 
 ```sh
 npm run build

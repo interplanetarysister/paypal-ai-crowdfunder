@@ -468,7 +468,12 @@ interface TrackerData {
     started_at: string;
     completed_at: string;
   }[];
-  events: { event_id: string; event_type: string; verified_at: string }[];
+  events: {
+    event_id: string;
+    event_type: string;
+    verified_at: string;
+    delivery_count: number;
+  }[];
   release_sha: string;
 }
 export function Tracker() {
@@ -613,7 +618,8 @@ export function Tracker() {
             )}
             {data.events.map((e) => (
               <p key={e.event_id}>
-                {e.event_type} · {e.event_id} · {e.verified_at}
+                {e.event_type} · {e.event_id} · {e.verified_at} ·{" "}
+                {e.delivery_count} verified deliveries
               </p>
             ))}
           </section>

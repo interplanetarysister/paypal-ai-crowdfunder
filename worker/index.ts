@@ -419,6 +419,37 @@ export async function handle(
       requireAdmin(user);
       return json(await sweep(env, db));
     }
+    if (path === "/api/admin/paypal/replay" && request.method === "POST") {
+      const actor = requireAdmin(user),
+        input = await body(request);
+      demand(
+        providerId(input.event_id),
+        "A verified demo event ID is required",
+      );
+      await limit(db, "webhook-replay:" + actor.id, 5, 300);
+      const events = await db.rows<{ order_id: string | null }>(
+        "events",
+        "?event_id=eq." + input.event_id,
+      );
+      demand(
+        events[0]?.order_id,
+        "Only associated, previously verified demo events can be replayed",
+        404,
+      );
+      demand(env.PAYPAL_WEBHOOK_ID, "Demo webhook binding required", 503);
+      const api = await paypal(env);
+      await api(
+        "POST",
+        "/v1/notifications/webhooks-events/" + input.event_id + "/resend",
+        { webhook_ids: [env.PAYPAL_WEBHOOK_ID] },
+      );
+      return json({
+        accepted: true,
+        mode: "sandbox",
+        event_id: input.event_id,
+        note: "Provider redelivery requested. Verify delivery_count and unchanged financial record counts separately.",
+      });
+    }
     if (path === "/api/admin/setup/paypal" && request.method === "POST") {
       requireAdmin(user);
       demand(env.SETUP_ENABLED === "true", "Setup is disabled", 404);
@@ -653,7 +684,11 @@ async function webhook(request: Request, env: DemoEnv, db: DB) {
     );
   if (seen[0]) {
     demand(seen[0].payload_hash === digest, "Webhook ID payload conflict", 409);
-    return json({ ok: true, duplicate: true });
+    const deliveries = await db.rpc<number>("event_replay", {
+      p_event: event.id,
+      p_hash: digest,
+    });
+    return json({ ok: true, duplicate: true, verified_deliveries: deliveries });
   }
   const resource = event.resource as
     | {

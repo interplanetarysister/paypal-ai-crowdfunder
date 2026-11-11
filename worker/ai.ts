@@ -8,7 +8,7 @@ import {
   type DB,
 } from "./core.ts";
 import type { DemoEnv, User } from "./types.ts";
-export const TEXT_MODEL = "@cf/meta/llama-3.1-8b-instruct";
+export const TEXT_MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
 export const IMAGE_MODEL = "@cf/black-forest-labs/flux-1-schnell";
 export const kinds = ["titles", "descriptions", "story", "section", "image"];
 export function validateAI(input: Record<string, unknown>) {
@@ -133,7 +133,7 @@ export async function generate(
   await limit(
     db,
     "ai:global:" + (input.kind === "image" ? "image:" : "text:") + day,
-    input.kind === "image" ? 4 : 30,
+    input.kind === "image" ? 4 : 25,
     86400,
   ); // conservative demo cap; provider quota still authoritative
   const id = crypto.randomUUID(),
@@ -248,7 +248,7 @@ export async function generate(
           { role: "user", content: JSON.stringify(input) },
         ],
         response_format: { type: "json_schema", json_schema: schema },
-        max_tokens: 1600,
+        max_tokens: 1200,
         temperature: 0.6,
       });
       result = parseAI(input.kind, response);

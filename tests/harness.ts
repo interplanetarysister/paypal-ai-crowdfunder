@@ -13,6 +13,12 @@ export async function harness() {
   await pg.exec(
     await readFile(new URL("../db/001_demo.sql", import.meta.url), "utf8"),
   );
+  await pg.exec(
+    await readFile(
+      new URL("../db/003_verified_webhook_replay.sql", import.meta.url),
+      "utf8",
+    ),
+  );
   let signed = true,
     failProvider = false,
     failAI = false,

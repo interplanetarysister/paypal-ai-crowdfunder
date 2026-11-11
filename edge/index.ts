@@ -22,7 +22,7 @@ const tables = [
   "tracker",
   "rate_limits",
 ].map((t) => "ifund_demo_" + t);
-const functions = ["finalize", "rate", "finance", "totals"].map(
+const functions = ["finalize", "rate", "finance", "totals", "event_replay"].map(
   (t) => "rpc/ifund_demo_" + t,
 );
 export async function dataGateway(
