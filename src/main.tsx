@@ -123,12 +123,13 @@ function App() {
   const [user, setUser] = useState<DemoUser | null>(null),
     [loading, setLoading] = useState(true),
     [status, setStatus] = useState<Status | null>(null),
+    [statusError, setStatusError] = useState<string | null>(null),
     [menu, setMenu] = useState(false);
   const loc = useLocation();
   useEffect(() => {
     api<Status>("/status")
       .then(setStatus)
-      .catch(() => {});
+      .catch(() => setStatusError("Live configuration check failed. Please reload to retry."));
     api<{ user: DemoUser | null }>("/session")
       .then((r) => setUser(r.user))
       .catch(() => {})
@@ -147,7 +148,7 @@ function App() {
   ] as const;
   const embedded = loc.pathname.startsWith("/embed/");
   return (
-    <Session.Provider value={{ user, loading, setUser, status }}>
+    <Session.Provider value={{ user, loading, setUser, status, statusError }}>
       {!embedded && (
         <>
           <a className="skip" href="#main">
