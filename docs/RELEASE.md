@@ -1,5 +1,18 @@
 # Hackathon release evidence — November 11, 2026
 
+## Latest independently checked release (November 11, ~09:35 PST)
+
+- **Deployed** Cloudflare Worker and frontend bundle identify GitHub commit `ae613457144eaebca09a1d7332f94c6590306723`, verified by independent public HTTPS probes. The homepage bundle contains the evidence-aware acceptance notice instead of a static blanket failure.
+- `GET /api/status` and `GET /api/campaigns` returned HTTP 200; sandbox, AI, R2 and storage bindings are configured. These flags are not proof of every provider operation.
+- Fresh isolated database query: **4 PayPal Sandbox orders; 2 provider-COMPLETED captures (USD $1.00 and $25.00); 2 matching receipts; 4 ledger rows with net 0; 2 recorded `PAYMENT.CAPTURE.COMPLETED` events.** Two orders remain unapproved/created and are not counted as donations.
+- Deployed server handler validates PayPal order/payee/currency/amount and completed capture before calling the durable finalization RPC; webhook handler requires `verification_status === "SUCCESS"` from PayPal before event persistence. An unsigned webhook POST returned HTTP 400 and unauthenticated PayPal status returned HTTP 401.
+- **The buyer-account approval UI has not been independently witnessed during this audit.** Provider-initiated fresh signed webhook redelivery, card-fields/3DS provider acceptance, cross-account browser security, and video parity are separate gates and remain open. Do not label the entire demo fully accepted.
+- **CI caveat:** GitHub Actions jobs fail before runner assignment (`runner_id=0`, no executed steps); actual Cloudflare Worker deployment succeeded independently. Investigate GitHub-hosted runner entitlement/billing/availability; do not represent those CI runs as passed.
+- Devpost's current submitted website is the guided demo `/hackathon` and description identifies the public AGPL repo, PayPal Sandbox/AI models, AG Grid/Charts and judge instructions. Video footage parity is still unverified.
+
+The snapshot below is historical evidence from earlier on November 11, not the latest account totals or deployed commit.
+
+
 **Status: live interactive prototype; partial provider acceptance; not yet certified end-to-end judge-ready.**
 
 ## Actual deployment and source
