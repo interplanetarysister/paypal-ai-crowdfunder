@@ -277,6 +277,7 @@ export function Wizard() {
             <label>
               What is the need, and what would support make possible?
               <textarea
+                data-judge="campaign-context"
                 rows={6}
                 value={draft.context}
                 onChange={(e) => change("context", e.target.value)}
