@@ -50,6 +50,7 @@ export interface Order {
   user_id: string;
   campaign_id: string | null;
   purpose: "campaign" | "platform_support";
+  checkout_method?: "paypal" | "card";
   amount_cents: number;
   currency: "USD";
   create_key: string;
