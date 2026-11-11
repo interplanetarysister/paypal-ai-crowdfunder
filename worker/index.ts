@@ -171,6 +171,16 @@ export async function handle(
       );
       return json({ campaigns: await withTotals(db, campaigns) });
     }
+    const focusMatch = path.match(/^\\/api\\/campaigns\\/([0-9a-f-]{36})\\/focus$/);
+    if (focusMatch && request.method === "GET") {
+      const found = await db.rows<{ id: string }>(
+        "campaigns",
+        "?select=id&id=eq." + focusMatch[1] + "&status=eq.published&fictional=eq.true&limit=1",
+      );
+      demand(found.length > 0, "Fictional campaign not found", 404);
+      const focus = await db.rpc("campaign_focus", { p_campaign: focusMatch[1] });
+      return json({ focus });
+    }
     const campaignMatch = path.match(/^\/api\/campaigns\/([0-9a-f-]{36})$/);
     if (campaignMatch && request.method === "GET") {
       const rows = await db.rows<Campaign>(
