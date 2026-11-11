@@ -175,15 +175,13 @@ test("AI provider failure preserves the campaign draft and never shows fake succ
   try {
     const user = await h.register("failure_judge");
     await connect(page, h);
-    await page
-      .context()
-      .addCookies([
-        {
-          name: "ifund_demo_session",
-          value: h.cookie.split("=")[1],
-          url: "http://127.0.0.1:4173",
-        },
-      ]);
+    await page.context().addCookies([
+      {
+        name: "ifund_demo_session",
+        value: h.cookie.split("=")[1],
+        url: "http://127.0.0.1:4173",
+      },
+    ]);
     h.failAI = true;
     await page.goto("/create");
     await page

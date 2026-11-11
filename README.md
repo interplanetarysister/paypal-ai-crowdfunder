@@ -17,7 +17,7 @@ This repository evolves the earlier local Crowdfunder demo into the IFund visual
 - Supabase: **only `ifund_demo_*` tables**, all with RLS and revoked direct browser grants. No production Auth identities are created. Demo identities are fictional handles with salted PBKDF2 passwords and opaque HttpOnly session cookies.
 - Dedicated R2 bucket for uploads and generated artwork.
 - Dedicated Supabase Edge gateway authenticated with a separate demo ECDSA key. Database service credentials stay inside Supabase. A direct server-only Supabase key is also supported for local setup.
-- AI text model: `@cf/meta/llama-3.2-3b-instruct`; artwork: `@cf/black-forest-labs/flux-1-schnell`. No canned successful fallback.
+- AI text model: `@cf/meta/llama-3.1-8b-instruct`; artwork: `@cf/black-forest-labs/flux-1-schnell`. No canned successful fallback.
 
 ## Run and verify locally
 
