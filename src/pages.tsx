@@ -17,6 +17,7 @@ import { api, post, money, labels, DISCLOSURE, type Campaign } from "./api";
 import { Brand, ErrorBox, Notice, useSession } from "./ui";
 import { CampaignCharts } from "./charts";
 import { CampaignGlobe } from "./globe";
+import { SandboxCardFields } from "./card-fields";
 export function useData<T>(path: string) {
   const [data, setData] = useState<T | null>(null),
     [error, setError] = useState(""),
@@ -637,8 +638,19 @@ export function Checkout({ support = false }: { support?: boolean }) {
             }
             onClick={begin}
           >
-            {busy ? "Connecting to PayPal…" : "Continue to PayPal Sandbox"}
+            {busy ? "Connecting to PayPal…" : "Continue with sandbox PayPal account"}
           </button>
+          <SandboxCardFields
+            amount={amount}
+            support={support}
+            campaignId={campaignId}
+            enabled={!!status?.payments_configured && (support || !!campaign)}
+            onCaptured={(result) => {
+              setError("");
+              setReceipt(result);
+              setMessage("Sandbox card capture and receipt confirmed by PayPal and IFund.");
+            }}
+          />
           {!status?.payments_configured && (
             <Notice>
               Sandbox merchant credentials and webhook access are not
@@ -685,9 +697,10 @@ export function Checkout({ support = false }: { support?: boolean }) {
         </div>
       )}
       <p className="meta">
-        PayPal determines which sandbox funding methods are eligible. Guest/card
-        checkout has not been verified for this merchant. Venmo, advanced card
-        fields, subscriptions, withdrawals and payouts are unavailable.
+        PayPal determines which sandbox payment methods are eligible. Hosted
+        card entry is attempted only when PayPal SDK v6 confirms merchant
+        eligibility; card capture is never assumed. Venmo, recurring payments,
+        subscriptions, withdrawals and payouts are unavailable.
       </p>
       <Link className="back" to="/dashboard">
         View donor records →
