@@ -1,5 +1,13 @@
 # Hackathon release evidence — November 11, 2026
 
+## Additional security and no-cost route audit (November 11, ~09:48 PST)
+
+- All 15 isolated `ifund_demo_*` tables have RLS enabled and deny direct `anon`/`authenticated` SELECT/INSERT grants. The internal `ifund_demo_seed_focus_for_campaign()` trigger's default public EXECUTE grant was revoked in the live database; after verification only `service_role` retained EXECUTE. Repository migration `db/004_simulated_agent_focus.sql` now contains the same grants.
+- Independent external HTTPS tests returned **200** for `/hackathon`, `/hackathon/analytic`, `/hackathon/analytics`, `/map`, `/create`, and `/login` (SPA HTML delivered). This checks routing/hosting, **not** full client-side functionality.
+- Unauthenticated requests to `/api/paypal/status`, `/api/finance`, `/api/admin/tracker`, and `/api/campaigns?mine=1` returned **401**, while `/api/status` and public `/api/campaigns` returned **200**. An unsigned checkout POST without Origin returned **403**; unsigned webhook POST returned **400**. Authenticated cross-user object-level authorization still needs browser testing.
+- Latest Workers AI ledger: **13 succeeded, 6 failed (19 total)**. Successful generation spans titles, descriptions, story, individual sections and two Flux image runs; two media records exist. Image display/permissions and full new-organizer journey remain unverified.
+- GitHub Actions jobs still fail **before runner assignment** with zero steps; reports from GitHub community describe identical symptoms for billing/entitlement blocks but that account-specific root cause is **not confirmed**. Cloudflare direct deployment is the verified working release path; do not claim CI green.
+
 ## Latest independently checked release (November 11, ~09:35 PST)
 
 - **Deployed** Cloudflare Worker and frontend bundle identify GitHub commit `ae613457144eaebca09a1d7332f94c6590306723`, verified by independent public HTTPS probes. The homepage bundle contains the evidence-aware acceptance notice instead of a static blanket failure.
