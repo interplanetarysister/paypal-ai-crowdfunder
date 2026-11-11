@@ -1,46 +1,67 @@
-# Release evidence
+# Hackathon release evidence — November 11, 2026
 
-**Status: deployment and provider acceptance in progress. Not certified judge-ready.**
+**Status: live interactive prototype; partial provider acceptance; not yet certified end-to-end judge-ready.**
 
-November 11, 2026. Actual deployment URL, commit and provider evidence are filled in after verification; no guessed URL is a completion claim.
+## Actual deployment and source
 
-## Implemented and locally checked
+- **First page of guided demo:** https://ifund-hackathon-demo.interplanetary-fund.workers.dev/hackathon
+- **Partner charts and AG Grid:** https://ifund-hackathon-demo.interplanetary-fund.workers.dev/hackathon/analytic (alias of `/hackathon/analytics`)
+- **Atlas:** https://ifund-hackathon-demo.interplanetary-fund.workers.dev/map
+- **Public code:** https://github.com/interplanetarysister/paypal-ai-crowdfunder — GitHub API reports `private=false`, recognized `AGPL-3.0` license.
+- **Devpost submitted project:** https://devpost.com/software/interplanetary-fund-5pznwy
+- **Prior live release commit:** `2a55c33ca83502a20b033aed2a86a31ca9fa2993`. New changes must pass the Cloudflare production build and release checks before this document can claim a newer deployed SHA.
+- Cloudflare bindings inspected without exposing values: `DEMO_ENABLED=true`, `AI_ENABLED=true`, dedicated Sandbox PayPal Secrets Store, PayPal webhook ID, isolated DB signer, Workers AI and R2.
+- Live Cloudflare browser on the prior release confirmed `/hackathon/analytic` renders three AG Charts canvases, ten AG Grid table rows and no chart errors on desktop (1280px) and mobile (390px). The nine-to-ten-step cyan highlighted judge tour was separately browser-verified at its entry step.
+- Previous release completed **17/17 automated tests**, including real local PGlite isolation tests with mocked PayPal and AI. The later Postman-contract tests must pass a **new** deployment to be counted.
 
-- IFund visual adaptation, discovery, synthetic Atlas, details, organizer profiles, QR/share/embed, guest draft composition, demo account auth, AI wizard and publish flow.
-- Sandbox-only order/capture verification, idempotency, pending/failure/cancellation states, atomic immutable capture/ledger/receipt and reconciliation.
-- Separate donor/organizer/admin finance views and protected tracker. Subscriptions and payouts unavailable.
-- Lint, TypeScript/build and nine unit/integration suites pass. Tests use local PostgreSQL plus mocked PayPal/AI.
-- Four browser scenarios have passed, including desktop 1440, tablet 768 and phone 390 layouts and WCAG A/AA automated scans on six core routes. Final post-change rerun is required before release.
-- Test screenshots in `evidence/browser/TEST_ONLY-*` are from isolated local tests. They do not establish provider or deployed acceptance.
+## Isolated Supabase audit (read only, November 11)
 
-## Direct infrastructure evidence
+| Evidence | Observed |
+| --- | ---: |
+| Published fictional campaigns | 82 |
+| PayPal Sandbox orders | 3 |
+| Provider-method captured orders | 1 |
+| Persisted captures | 1 |
+| Receipts | 1 |
+| Ledger rows | 2 |
+| Ledger sum of signed cents | 0 |
+| Orders using Card Fields checkout method | 0 |
+| Workers AI run attempts | 14 |
+| Workers AI successes | 8 |
+| Workers AI failures | 6 |
+| `PAYMENT.CAPTURE.COMPLETED` event records | 1 |
+| Maximum recorded delivery_count for that event | 2 |
 
-- Base44 source access: blocked by paid Builder plan; exported-source fallback used without credits.
-- Supabase free third project creation: refused due two-project free limit. Existing project fallback is limited to new `ifund_demo_*` objects.
-- Migrations `ifund_demo_isolated_hackathon` and `ifund_demo_fictional_showcase` applied successfully.
-- Authenticated catalog inspection confirms twelve demo tables have RLS enabled; anon SELECT and authenticated INSERT are false for all twelve.
-- New `ifund-demo-data` Edge Function deployed ACTIVE version 1, with independent ECDSA request verification. It does not export database service credentials.
-- New dedicated R2 bucket `ifund-hackathon-demo-media` created in WNAM.
-- Sandbox credential references inspected: Secrets Store `Paypal_sandbox_app_id` / `paypal_sandbox_app_secret`. Values were not printed or committed.
-- Initial Cloudflare automatic approval review failed due a usage limit. A later approval-reviewed inspection succeeded; access is restored.
-- GitHub createRepository was refused by the integration. Existing separate public `paypal-ai-crowdfunder` is reused with its history retained.
+The AI audit shows successful title, description, story, single-section and image outputs across model versions. The currently deployed text adapter uses `@cf/meta/llama-3.3-70b-instruct-fp8-fast` and artwork uses `@cf/black-forest-labs/flux-1-schnell`.
 
-## Financial/provider gates
+These database rows are meaningful existing integration evidence, **not** proof that every current visitor path was independently reproduced in a fresh PayPal Sandbox buyer browser. In particular, one recorded webhook event with delivery count two is not itself conclusive proof of fresh provider-authenticated replay acceptance. Pending/unapproved orders never count toward raised funds.
 
-| Gate                                           | Status                    | Evidence                          |
-| ---------------------------------------------- | ------------------------- | --------------------------------- |
-| Live model execution on independent deployment | NOT VERIFIED              | Pending actual request            |
-| Real PayPal Sandbox order                      | NOT VERIFIED              | Pending actual request            |
-| Eligible buyer approval                        | NOT VERIFIED              | Requires sandbox buyer            |
-| Real provider capture                          | NOT VERIFIED              | No capture ID claimed             |
-| Genuine signed capture webhook                 | NOT VERIFIED              | No signature acceptance claimed   |
-| Replay without duplicate accounting            | NOT VERIFIED live         | Local mock/SQL tests only         |
-| Canonical ledger and receipt                   | NOT VERIFIED live         | No successful financial seed data |
-| Independent public deployment                  | NOT VERIFIED              | Deployment pending                |
-| Public license recognized by GitHub            | NOT VERIFIED after update | Pending push/readback             |
+## Gate status by feature
 
-## Devpost/video evidence
+| Item | Status | Specific evidence / gap |
+| --- | --- | --- |
+| Independent dedicated Worker public | PASS | Official workers.dev origin deployed with guided route and partner graphs. |
+| Public Github + recognized OSS license | PASS | GitHub reports a public repo and `AGPL-3.0`. |
+| Fictional, interactive Atlas and discovery | PASS public rendering | 82 published fictional campaigns; synthetic map markers and accessible fallback. |
+| AG Charts Community and AG Grid Community | PASS public rendering | Three real chart canvases and AG Grid rows rendered on desktop/mobile; free Community editions. |
+| Separate demo logins and persisted campaigns | IMPLEMENTED; new-session QA OPEN | Salted demo session implementation, owner/write checks and automated tests. |
+| Real-model Workers AI | PARTIAL PROVIDER EVIDENCE | 8 stored successes from 14 runs; fresh all-stages user journey pending. |
+| Sandbox PayPal Orders v2 and merchant verification | PARTIAL PROVIDER EVIDENCE | One captured PayPal-method order, receipt and balanced ledger; fresh buyer/approval QA pending. |
+| Genuine signed webhook + redelivery | PARTIAL DB EVIDENCE | One completed-capture event, delivery count 2; fresh PayPal-authenticated replay not independently verified. |
+| Card Fields & 3DS | IMPLEMENTED, PROVIDER ACCEPTANCE NOT VERIFIED | No card-method orders; only if eligible merchant. |
+| Owner/admin authorization negative tests | AUTOMATED ONLY | Full browser account-isolation test still required. |
+| Postman sponsor collection | IMPLEMENTED; actual Postman run NOT VERIFIED | `postman/IFund_PayPal_AI_Sandbox.postman_collection.json`, including protected tests and no hardcoded secrets. |
+| Public video showing THIS release | NOT VERIFIED | Prior YouTube Shorts 2:01 documented; its current demo footage unverified. |
+| Devpost complete, corrected fields and links | PARTIAL | Previously submitted; the separate legacy project website field may still point at Base44. Confirm custom working-demo answer independently. |
+| Eligibility and personal attestations | OWNER ATTESTATION | Neither source code nor AI can certify personal eligibility. |
 
-Authenticated Devpost `get_project` confirms project 1484362 / `interplanetary-fund-5pznwy` is published and was submitted to `paypalaihackathon` November 4. Its current submitted website reference is the original Base44 app. The existing YouTube link is public and approximately two minutes long. Neither fact establishes this standalone demo's end-to-end acceptance. No submission was changed in this pass.
+## Important boundaries
 
-Before demo tables were created, direct read-only counts were: production donations 0, production ledger 0, production Auth users 5, production campaigns 40. Recheck and qualify concurrent changes when recording the final isolation result; this task's mutations are limited to the demo objects.
+The demo writes only `ifund_demo_*` objects, uses fictional user identities and PayPal Sandbox, and does not turn on real payouts, subscriptions or production financial ledger writes. Real `interplanetaryfund.com` analytics and Atlas are a separate Cloudflare Pages release; Base44 direct source access is gated behind the user's current workspace plan and was not used.
+
+**Plan and acceptance actions:** [REMAINING_HACKATHON_PLAN.md](REMAINING_HACKATHON_PLAN.md).  
+**Judge testing:** [JUDGE_TESTING.md](JUDGE_TESTING.md).  
+**Video acceptance:** [VIDEO.md](VIDEO.md).  
+**Postman collection:** [../postman/IFund_PayPal_AI_Sandbox.postman_collection.json](../postman/IFund_PayPal_AI_Sandbox.postman_collection.json).
+
+**Official deadline:** November 12, 2026 at 12:00 p.m. Pacific; judges start December 1. Do not infer certification from a successful Cloudflare deploy or static screenshots.
