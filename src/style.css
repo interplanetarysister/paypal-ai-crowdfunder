@@ -1608,3 +1608,14 @@ footer .brand small {
 .sandbox-card-inputs input { margin-bottom: 4px; }
 .sandbox-card-section .error { margin-top: 14px; overflow-wrap: anywhere; }
 .sandbox-card-section > .secondary { margin-top: 9px; }
+
+/* AG Grid Community financial history, loaded only when the donor dashboard opens. */
+.finance-grid-shell { margin: 16px 0; min-width: 0; overflow-x: auto; }
+.finance-ag-grid { width: 100%; min-width: 820px; overflow: hidden; border-radius: 12px; }
+.finance-accessible-history { margin-top: 16px; border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; }
+.finance-accessible-history > summary { cursor: pointer; font-weight: 650; }
+.finance-accessible-history > .transaction-list { margin-top: 12px; }
+@media (max-width: 760px) {
+  .finance-grid-shell { max-width: calc(100vw - 26px); }
+  .finance-accessible-history { padding: 12px; }
+}
