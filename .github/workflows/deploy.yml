@@ -1,6 +1,15 @@
 name: Deploy isolated demo
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'worker/**'
+      - 'db/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/deploy.yml'
 permissions:
   contents: read
 jobs:
