@@ -14,17 +14,17 @@ type FinanceOrder = {
 type ReceiptRef = { id: string; capture_id: string };
 type GridRow = FinanceOrder & { receipt_id: string | null };
 
-type GridApi = { destroy(): void };
-type GridNamespace = {
+export type GridApi = { destroy(): void };
+export type GridNamespace = {
   createGrid(element: HTMLElement, options: Record<string, unknown>): GridApi;
 };
-type GridWindow = Window & { agGrid?: GridNamespace };
+export type GridWindow = Window & { agGrid?: GridNamespace };
 
 const GRID_URL =
   "https://cdn.jsdelivr.net/npm/ag-grid-community@36.3.0/dist/ag-grid-community.min.js";
 let loadingGrid: Promise<void> | null = null;
 
-function loadCommunityGrid(): Promise<void> {
+export function loadCommunityGrid(): Promise<void> {
   if ((window as GridWindow).agGrid?.createGrid) return Promise.resolve();
   if (!loadingGrid) {
     loadingGrid = new Promise<void>((resolve, reject) => {
