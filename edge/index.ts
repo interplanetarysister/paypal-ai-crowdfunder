@@ -21,6 +21,7 @@ const tables = [
   "media",
   "tracker",
   "rate_limits",
+  "flags",
   "agent_focus",
 ].map((t) => "ifund_demo_" + t);
 const functions = ["finalize", "rate", "finance", "totals", "event_replay", "campaign_focus"].map(
