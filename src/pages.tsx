@@ -15,6 +15,8 @@ import {
 import { QRCodeSVG } from "qrcode.react";
 import { api, post, money, labels, DISCLOSURE, type Campaign } from "./api";
 import { Brand, ErrorBox, Notice, useSession } from "./ui";
+import { CampaignCharts } from "./charts";
+import { CampaignGlobe } from "./globe";
 export function useData<T>(path: string) {
   const [data, setData] = useState<T | null>(null),
     [error, setError] = useState(""),
@@ -188,9 +190,7 @@ export function Discovery({ map = false }: { map?: boolean }) {
       "/campaigns",
     ),
     [search, setSearch] = useState(""),
-    [category, setCategory] = useState(""),
-    [zoom, setZoom] = useState(1),
-    [selected, setSelected] = useState<Campaign | null>(null);
+    [category, setCategory] = useState("");
   const campaigns = (data?.campaigns || []).filter(
     (c) =>
       (!category || c.category === category) &&
@@ -239,91 +239,7 @@ export function Discovery({ map = false }: { map?: boolean }) {
       </div>
       <ErrorBox error={error} />
       {loading && <p role="status">Discovering campaigns…</p>}
-      {map && (
-        <section className="atlas panel">
-          <div className="actions">
-            <h2>Synthetic campaign locations</h2>
-            <button
-              className="secondary"
-              onClick={() => setZoom(Math.min(3, zoom + 0.5))}
-              aria-label="Zoom in map"
-            >
-              +
-            </button>
-            <button
-              className="secondary"
-              onClick={() => setZoom(Math.max(1, zoom - 0.5))}
-              aria-label="Zoom out map"
-            >
-              −
-            </button>
-            <button
-              className="ghost"
-              onClick={() => {
-                setZoom(1);
-                setSelected(null);
-              }}
-            >
-              Reset map
-            </button>
-          </div>
-          <div className="map-scroll">
-            <div className="world" style={{ width: zoom * 100 + "%" }}>
-              <svg viewBox="0 0 720 360" aria-hidden="true">
-                <defs>
-                  <pattern
-                    id="grid"
-                    width="60"
-                    height="60"
-                    patternUnits="userSpaceOnUse"
-                  >
-                    <path
-                      d="M 60 0 L 0 0 0 60"
-                      fill="none"
-                      stroke="#35506d"
-                      strokeWidth=".6"
-                    />
-                  </pattern>
-                </defs>
-                <rect width="720" height="360" fill="url(#grid)" />
-                <path
-                  d="M55 75 140 40 220 67 202 113 151 144 166 174 204 196 224 238 201 302 174 325 154 260 136 202 109 171 83 126Z M320 77 390 45 462 61 500 47 625 64 686 114 637 160 585 167 544 140 505 174 476 152 457 199 432 221 408 285 368 270 337 204 342 159 306 138Z M576 245 618 225 666 250 652 282 597 286Z"
-                  fill="#193a53"
-                  stroke="#436581"
-                  strokeWidth="1"
-                />
-              </svg>
-              {campaigns.map((c) => (
-                <button
-                  key={c.id}
-                  className="map-marker"
-                  aria-label={"Show " + c.title + " at synthetic " + c.location}
-                  style={{
-                    left: ((c.longitude + 180) / 360) * 100 + "%",
-                    top: ((90 - c.latitude) / 180) * 100 + "%",
-                  }}
-                  onClick={() => setSelected(c)}
-                >
-                  <MapPin size={23} />
-                </button>
-              ))}
-            </div>
-          </div>
-          <p className="meta">
-            Schematic world map · Synthetic coordinates · Use campaign markers
-            or the accessible cards below.
-          </p>
-          {selected && (
-            <div className="map-selection">
-              <h3>{selected.title}</h3>
-              <p>{selected.location} (synthetic)</p>
-              <Link className="button small" to={"/campaign/" + selected.id}>
-                View fictional campaign
-              </Link>
-            </div>
-          )}
-        </section>
-      )}
+      {map && <CampaignGlobe campaigns={campaigns} />}
       {!loading && !error && (
         <p className="meta" role="status">
           {campaigns.length} fictional{" "}
@@ -438,6 +354,7 @@ export function Details() {
               )}
             </aside>
           </div>
+          <CampaignCharts campaign={c} />
         </>
       )}
     </>
