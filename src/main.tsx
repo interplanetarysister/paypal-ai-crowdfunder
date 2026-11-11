@@ -35,6 +35,7 @@ import {
 import { Wizard } from "./wizard";
 import { Dashboard, Showcase, Tracker } from "./workspace";
 import { CampaignAnalytics } from "./analytics";
+import { GuidedDemoOverlay } from "./judge-guide";
 import "./style.css";
 import { Session, Brand, ErrorBox, Notice, Protected, useSession } from "./ui";
 function Login() {
@@ -307,6 +308,7 @@ function App() {
           </nav>
         </>
       )}
+      {!embedded && <GuidedDemoOverlay />}
     </Session.Provider>
   );
 }
