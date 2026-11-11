@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { harness, origin } from "./harness.ts";
 import { verifyOrder, approvalUrl } from "../worker/paypal.ts";
-import { mayCaptureSandboxCard } from "../src/sandbox-liability";
+import { mayCaptureSandboxCard } from "../src/sandbox-liability.ts";
 import type { Order, ProviderOrder } from "../worker/types.ts";
 const fixture: Order = {
   id: "7b69009e-b66a-445e-8c43-147df51f2b0c",
