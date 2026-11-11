@@ -66,3 +66,14 @@ Pending, cancelled, failed and unverified requests are not collected funds. Plat
 ## Judge instructions and compliance
 
 Read [JUDGE_TESTING.md](docs/JUDGE_TESTING.md), [COMPLIANCE.md](docs/COMPLIANCE.md), [VIDEO.md](docs/VIDEO.md) and the dated [release evidence](docs/RELEASE.md). This source is not a certification of eligibility or completed provider testing. The existing Devpost submission is preserved until a reviewed update is authorized and verified.
+
+## Judge charts and interactive globe (free-tier implementation)
+
+- **AG Charts Community donut charts** are loaded from a version-pinned `ag-charts-community@14.2.0` UMD file on jsDelivr when a campaign page is opened. There is no Enterprise import or paid license. The static content security policy permits that CDN only for scripts. If it cannot load, the numeric chart data remains visible.
+- **Funding donut:** `raised_cents` is derived exclusively from PayPal Sandbox provider-verified captures with durable receipts; the other segment is the fictional remaining goal. No seed or social activity becomes a donation.
+- **Agent-focus donut:** the `ifund_demo_agent_focus` table and `ifund_demo_campaign_focus` RPC provide *explicitly simulated* attention allocations for Story coach, Discovery guide, Outreach assistant and Safety reviewer. They are deterministic fictional planning units—not real work, time, costs, AI requests, or money.
+- **Interactive globe:** a touch/keyboard-accessible free SVG orthographic globe visualizes synthetic location coordinates from the same campaign discovery API, with selectable markers. This is illustrative, not an accurate geographic boundary map. AG Charts geographic maps require Enterprise licensing and were intentionally not used.
+- **Security:** migration `db/004_simulated_agent_focus.sql` enables RLS, revokes browser grants and grants `service_role` only; read access is through the existing signed demo data Edge gateway. The live site is a separate Worker and does not write to production finance tables.
+- **Testing:** `tests/payments.test.ts` verifies the new focus endpoint does not modify ledger totals and that anonymous direct database access is denied.
+
+The demo is intentionally self-contained apart from its already configured Supabase, Cloudflare and PayPal Sandbox integrations. The AG Charts CDN dependency needs network access; the fallback remains readable without it.
