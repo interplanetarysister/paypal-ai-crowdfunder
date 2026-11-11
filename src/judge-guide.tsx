@@ -25,8 +25,14 @@ const steps: Step[] = [
     target: '[data-judge="analytics-link"]',
   },
   {
+    title: "Inspect partner AG Charts donuts",
+    instruction: "Review the circled funding, category and agent-focus charts. Choose a campaign under Agent focus to change its simulated role allocations. Only PayPal-verified sandbox campaign captures count as funding.",
+    route: "/hackathon/analytics",
+    target: '[data-judge="analytics-charts"]',
+  },
+  {
     title: "Filter the AG Grid dashboard",
-    instruction: "The circled grid contains fictional goals and *verified* PayPal Sandbox captures in separate columns. Choose a campaign title to inspect it.",
+    instruction: "Sort or filter the highlighted AG Grid table. Fictional goals, provider-verified Sandbox captures and capture counts appear in separate columns. Select a campaign name for details.",
     route: "/hackathon/analytics",
     target: '[data-judge="analytics-grid"]',
   },
