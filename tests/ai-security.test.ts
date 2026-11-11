@@ -142,7 +142,7 @@ test("real PostgreSQL: deny-by-default RLS/grants, atomic ledger, immutable reco
   }>(
     "select c.relname,c.relrowsecurity,has_table_privilege('anon',c.oid,'select') as anon_select,has_table_privilege('authenticated',c.oid,'insert') as member_insert from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname='public' and c.relkind='r' and c.relname like 'ifund_demo_%'",
   );
-  assert.equal(checks.rows.length, 12);
+  assert.equal(checks.rows.length, 13);
   assert(
     checks.rows.every(
       (r) => r.relrowsecurity && !r.anon_select && !r.member_insert,
