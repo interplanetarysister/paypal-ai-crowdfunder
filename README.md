@@ -103,3 +103,10 @@ The demo funding donut uses AG Charts Community (free) and the globe uses free i
 **3DS safeguard:** SDK v6 and the server enforce a conservative 3-D Secure card policy. Before a provider CAPTURE call for a card order, the server queries PayPal Orders v2 `?fields=payment_source` and inspects `payment_source.card.authentication_result`. A clear failure/unknown result blocks the capture. Issuer-not-enrolled/bypassed cases follow PayPal's response guidance; no cardholder credentials are logged or stored.
 
 Automated tests include three distinct **mock-provider** card-funded contribution scenarios, cross-purpose totals, 3DS failures, idempotency, ledger balancing and receipts. Genuine sandbox card-funded captures still require provider-side evidence and are not asserted as completed.
+
+
+## Public judge AG Grid analytics (no login)
+
+The guided entry page at `/hackathon` now links directly to `/hackathon/analytics`. This public read-only view reuses AG Grid Community and the existing `GET /api/campaigns` endpoint to show each of the populated fictional campaigns without requiring judges to register or run PayPal. Judges can filter/sort category, title, synthetic location, **fictional goal**, **verified PayPal Sandbox captured amount**, percentage and provider capture count, then open the campaign for the AG Charts Community funding and simulated agent-focus donuts or interactive globe.
+
+No new financial tables, fake donation receipts, paid AG Grid/Charts Enterprise features, or privileged API endpoints were added for the view. The separate `/dashboard` financial grid remains owner-scoped and requires a demo account. These values must never be presented as real donations.
