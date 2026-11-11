@@ -128,7 +128,7 @@ export function CampaignAnalytics() {
             <p className="meta"><ShieldCheck size={15}/> {stats.categories} fictional categories · Only public campaign fields · No payment credentials or donor records</p>
             {gridState === "loading" && <p role="status">Loading interactive AG Grid Community…</p>}
             {gridState === "fallback" && <p role="status">The interactive grid is unavailable; the accessible campaign list below still works.</p>}
-            <div className="public-analytics-grid" role="region" aria-label="Sortable and filterable fictional campaign analytics" tabIndex={0}>
+            <div className="public-analytics-grid" data-judge="analytics-grid" role="region" aria-label="Sortable and filterable fictional campaign analytics" tabIndex={0}>
               <div ref={container} className="public-ag-grid"/>
             </div>
             <details className="finance-accessible-history">
