@@ -431,3 +431,57 @@ test("PayPal 3DS policy recognizes issuer approval and blocks failed or unknown 
   assert.equal(mayCaptureSandboxCard("NO", "B"), true); // bank bypass
   assert.equal(mayCaptureSandboxCard("INVALID", "Y"), false);
 });
+
+test("three independent mocked card-funded sandbox orders keep campaign and platform support separate", async (t) => {
+  const h = await harness();
+  t.after(() => h.close());
+  await h.register();
+  const campaignA = await h.campaign();
+  const campaignB = await h.campaign();
+  const scenarios = [
+    { amount_cents: 100, purpose: "campaign", campaign_id: campaignA.id },
+    { amount_cents: 500, purpose: "platform_support", campaign_id: null },
+    { amount_cents: 1000, purpose: "campaign", campaign_id: campaignB.id },
+  ] as const;
+  const createdOrders: string[] = [];
+  for (const scenario of scenarios) {
+    const created = await h.call("/paypal/orders", "POST", {
+      ...scenario, checkout_method: "card", key: crypto.randomUUID(),
+    });
+    assert.equal(created.status, 201, await created.clone().text());
+    const order = await created.json() as { id: string; paypal_order_id: string };
+    createdOrders.push(order.id);
+    const provider = h.providerOrders.get(order.paypal_order_id)!;
+    provider.status = "APPROVED";
+    const captured = await h.call("/paypal/orders/" + order.id + "/capture", "POST", {});
+    assert.equal(captured.status, 200, await captured.clone().text());
+    assert.equal((await captured.json() as { status: string }).status, "captured");
+  }
+  const evidence = await h.pg.query<{ orders: number; captures: number; receipts: number; ledger: number; total: number }>(
+    `select
+      (select count(*)::int from public.ifund_demo_orders where checkout_method='card') as orders,
+      (select count(*)::int from public.ifund_demo_captures) as captures,
+      (select count(*)::int from public.ifund_demo_receipts) as receipts,
+      (select count(*)::int from public.ifund_demo_ledger) as ledger,
+      (select coalesce(sum(amount_cents),0)::int from public.ifund_demo_ledger) as total`,
+  );
+  assert.deepEqual(evidence.rows, [{ orders: 3, captures: 3, receipts: 3, ledger: 6, total: 0 }]);
+  const fundsA = await (await h.call("/campaigns/" + campaignA.id)).json() as {
+    campaign: { raised_cents: number };
+  };
+  const fundsB = await (await h.call("/campaigns/" + campaignB.id)).json() as {
+    campaign: { raised_cents: number };
+  };
+  assert.equal(fundsA.campaign.raised_cents, 100);
+  assert.equal(fundsB.campaign.raised_cents, 1000);
+  const donor = await (await h.call("/finance?view=donor")).json() as {
+    captured_cents: number;
+    platform_support_cents: number;
+  };
+  assert.equal(donor.captured_cents, 1100);
+  assert.equal(donor.platform_support_cents, 500);
+  for (const orderId of createdOrders) {
+    assert.equal((await h.call("/paypal/orders/" + orderId + "/reconcile", "POST", {})).status, 200);
+  }
+  assert.equal((await h.pg.query("select * from public.ifund_demo_receipts")).rows.length, 3);
+});
