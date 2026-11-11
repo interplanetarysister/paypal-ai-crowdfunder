@@ -6,12 +6,14 @@ interface SessionValue {
   loading: boolean;
   setUser: (u: DemoUser | null) => void;
   status: Status | null;
+  statusError: string | null;
 }
 export const Session = createContext<SessionValue>({
   user: null,
   loading: true,
   setUser: () => {},
   status: null,
+  statusError: null,
 });
 export const useSession = () => useContext(Session);
 export function Notice({ children }: { children: ReactNode }) {
