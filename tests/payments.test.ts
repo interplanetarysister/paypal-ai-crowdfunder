@@ -357,3 +357,53 @@ test("fictional campaign focus exposes simulated allocations without changing pa
   assert.equal(grants.rows[0].anon_select, false);
   assert.equal(grants.rows[0].anon_execute, false);
 });
+
+
+test("sandbox Card Fields: token, method isolation, approval, capture and exactly-once ledger", async (t) => {
+  const h = await harness();
+  t.after(() => h.close());
+  // Tokens require an authenticated demo user; browser-safe token never reveals merchant credentials.
+  assert.equal((await h.call("/paypal/browser-token")).status, 401);
+  await h.register();
+  const tokenResponse = await h.call("/paypal/browser-token");
+  assert.equal(tokenResponse.status, 200);
+  assert.equal(tokenResponse.headers.get("cache-control"), "no-store");
+  const token = await tokenResponse.json() as { clientToken: string };
+  assert.equal(token.clientToken, "MOCK_BROWSER_SAFE_CLIENT_TOKEN");
+  const campaign = await h.campaign();
+  const key = crypto.randomUUID();
+  const input = {
+    purpose: "campaign",
+    campaign_id: campaign.id,
+    amount_cents: 300,
+    checkout_method: "card",
+    key,
+  };
+  assert.equal((await h.call("/paypal/orders", "POST", { ...input, checkout_method: "other" })).status, 400);
+  const created = await h.call("/paypal/orders", "POST", input);
+  assert.equal(created.status, 201, await created.clone().text());
+  const order = await created.json() as { id: string; paypal_order_id: string; approval_url: string | null };
+  assert.equal(order.approval_url, null);
+  const retry = await h.call("/paypal/orders", "POST", input);
+  assert.equal(retry.status, 200);
+  assert.equal((await retry.json() as { paypal_order_id: string }).paypal_order_id, order.paypal_order_id);
+  assert.equal(h.providerOrders.size, 1);
+  // Existing key cannot be silently switched to PayPal redirect checkout.
+  assert.equal((await h.call("/paypal/orders", "POST", { ...input, checkout_method: "paypal" })).status, 409);
+  assert.equal((await h.call("/paypal/orders/" + order.id + "/capture", "POST", {})).status, 409);
+  const mockProvider = h.providerOrders.get(order.paypal_order_id)!;
+  mockProvider.status = "APPROVED";
+  const capture = await h.call("/paypal/orders/" + order.id + "/capture", "POST", {});
+  assert.equal(capture.status, 200, await capture.clone().text());
+  const result = await capture.json() as { status: string; capture_id: string; receipt_id: string };
+  assert.equal(result.status, "captured");
+  assert.ok(result.capture_id);
+  assert.ok(result.receipt_id);
+  assert.equal((await h.call("/paypal/orders/" + order.id + "/reconcile", "POST", {})).status, 200);
+  const balance = await h.pg.query<{ n: number; total: number }>(
+    "select count(*)::int as n, sum(amount_cents)::int as total from public.ifund_demo_ledger",
+  );
+  assert.deepEqual(balance.rows, [{ n: 2, total: 0 }]);
+  assert.equal((await h.pg.query("select * from public.ifund_demo_receipts")).rows.length, 1);
+  assert.equal((await h.pg.query("select checkout_method from public.ifund_demo_orders")).rows[0].checkout_method, "card");
+});
