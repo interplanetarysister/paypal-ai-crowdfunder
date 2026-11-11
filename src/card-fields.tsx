@@ -182,9 +182,14 @@ export function SandboxCardFields({
         billingAddress: { postalCode },
       });
       if (outcome.state === "canceled") {
-        setInfo("Card authentication was canceled. No donation was credited.");
+        // Do not reuse a canceled or declined provider order for a new card attempt.
+        sessionStorage.removeItem("ifund-card-checkout-intent");
+        setPendingOrder(null);
+        setInfo("Card authentication was canceled. No donation was credited. You can retry with a fresh sandbox order.");
       } else if (outcome.state === "failed") {
-        setError("The sandbox card payment was not approved. No donation was credited.");
+        sessionStorage.removeItem("ifund-card-checkout-intent");
+        setPendingOrder(null);
+        setError("The sandbox card payment was not approved. No donation was credited. Retry with another test card.");
       } else if (outcome.state === "succeeded") {
         if (outcome.data?.orderId && outcome.data.orderId !== order.paypal_order_id)
           throw Error("PayPal returned an unexpected order association");
