@@ -22,6 +22,9 @@ export async function harness() {
   await pg.exec(
     await readFile(new URL("../db/004_simulated_agent_focus.sql", import.meta.url), "utf8"),
   );
+  await pg.exec(
+    await readFile(new URL("../db/005_sandbox_card_checkout.sql", import.meta.url), "utf8"),
+  );
   let signed = true,
     failProvider = false,
     failAI = false,
@@ -215,11 +218,13 @@ export async function harness() {
     if (url.hostname === "api-m.sandbox.paypal.com") {
       apiCalls.push(url.pathname);
       if (failProvider) throw Error("mock timeout");
-      if (url.pathname === "/v1/oauth2/token")
+      if (url.pathname === "/v1/oauth2/token") {
+        const browserToken = String(init?.body || "").includes("response_type=client_token");
         return Response.json({
-          access_token: "MOCK_TOKEN_NOT_REAL",
+          access_token: browserToken ? "MOCK_BROWSER_SAFE_CLIENT_TOKEN" : "MOCK_TOKEN_NOT_REAL",
           token_type: "Bearer",
         });
+      }
       if (url.pathname.startsWith("/v1/notifications/webhooks/"))
         return Response.json({
           id: env.PAYPAL_WEBHOOK_ID,
