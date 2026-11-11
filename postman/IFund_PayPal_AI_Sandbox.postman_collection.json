@@ -1,0 +1,572 @@
+{
+  "info": {
+    "name": "IFund — PayPal AI Hackathon Sandbox API Verification",
+    "_postman_id": "e302285c-7e85-4db7-aef9-1ebc66092d25",
+    "description": "Read-only checks plus explicit manual sandbox verification for the existing Cloudflare IFund demo. Requires separate fictional demo login and distinct PayPal Personal Sandbox buyer; card credentials never enter Postman or IFund. Do not select collection-wide Run for capture before buyer approval. Actual signed webhook redelivery requires admin-only authenticated provider evidence and is intentionally not automated here.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "00 - Check demo sandbox status",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/status",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "status"
+          ]
+        },
+        "description": "Safe public status; never counts as financial acceptance. Confirm sandbox mode and deployment configuration."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const response=pm.response.json();",
+              "pm.test('sandbox mode',()=>pm.expect(response.mode).to.eql('sandbox'));",
+              "pm.test('withdrawals disabled',()=>pm.expect(response.withdrawals_enabled).to.eql(false));",
+              "pm.test('payments configured (not captured)',()=>pm.expect(response.payments_configured).to.eql(true));",
+              "pm.environment.set('releaseSha',String(response.release_sha||''));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "01 - Public published fictional campaigns",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/campaigns",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "campaigns"
+          ]
+        },
+        "description": "Select one published fictional campaign. This endpoint does not include private donor data."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body=pm.response.json();",
+              "pm.test('public list',()=>{pm.response.to.have.status(200);pm.expect(body.campaigns).to.be.an('array');});",
+              "const chosen=(body.campaigns||[]).find(c=>c.status==='published'&&c.fictional===true);",
+              "if(chosen)pm.environment.set('campaignId',chosen.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 - Register ONE fictional demo identity (optional)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/register",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "register"
+          ]
+        },
+        "description": "Run once, only with a new fictional handle and distinct 12+ character password in a local non-shared Postman environment. Repeated registration will fail; use login instead.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"handle\": \"{{demoHandle}}\",\n  \"password\": \"{{demoPassword}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('demo account created',()=>pm.response.to.have.status(200));",
+              "pm.test('returns nonadmin profile',()=>pm.expect(pm.response.json().user.role).to.eql('member'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 - Login fictional demo identity",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "login"
+          ]
+        },
+        "description": "Postman retains the first-party HttpOnly demo session cookie for later requests; NEVER paste live IFund credentials.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"handle\": \"{{demoHandle}}\",\n  \"password\": \"{{demoPassword}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('demo session established',()=>pm.response.to.have.status(200));",
+              "pm.test('fictional member returned',()=>pm.expect(pm.response.json().user).to.have.property('id'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 - Verify authenticated sandbox webhook registration",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/paypal/status",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "paypal",
+            "status"
+          ]
+        },
+        "description": "Real PayPal Sandbox OAuth and registered webhook check; verifies configured endpoint but does not prove a signed webhook delivery."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body=pm.response.json();",
+              "pm.test('PayPal sandbox OAuth accepted',()=>{pm.response.to.have.status(200);pm.expect(body.oauth_verified).to.eql(true);});",
+              "pm.test('sandbox webhook matches demo origin',()=>pm.expect(body.webhook_registered).to.eql(true));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 - Real Workers AI: five title options",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/ai/generate",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "ai",
+            "generate"
+          ]
+        },
+        "description": "Calls authenticated Cloudflare Workers AI, subject to strict free-tier quota; only run once for live evidence. If provider declines, do not record AI success.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"kind\": \"titles\",\n  \"category\": \"community\",\n  \"context\": \"A fictional community science and repair workshop needs help buying safe equipment for public sessions.\",\n  \"style\": \"futuristic\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if(pm.response.code===200){const body=pm.response.json();pm.test('five real-model titles',()=>pm.expect(body.options).to.be.an('array').with.lengthOf(5));pm.test('provider evidence present',()=>pm.expect(body.execution).to.have.property('id'));}else{pm.test('AI unavailable is not a successful generation',()=>pm.expect(pm.response.code).to.be.within(400,599));}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 - Create $1 PayPal Sandbox order ONLY (no capture)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/paypal/orders",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "paypal",
+            "orders"
+          ]
+        },
+        "description": "Only creates a pending $1 USD order for a fictional campaign. Buyer approval is a separate PayPal Sandbox action; no payment is credited here.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"purpose\": \"campaign\",\n  \"campaign_id\": \"{{campaignId}}\",\n  \"amount_cents\": 100,\n  \"key\": \"{{checkoutKey}}\",\n  \"checkout_method\": \"paypal\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body=pm.response.json();",
+              "pm.test('provider order exists',()=>{pm.expect([200,201]).to.include(pm.response.code);pm.expect(body.paypal_order_id).to.be.a('string');});",
+              "pm.test('approval only, not captured',()=>pm.expect(body.status).to.not.eql('captured'));",
+              "if(body.id)pm.environment.set('orderId',body.id);",
+              "if(body.approval_url)pm.environment.set('approvalUrl',body.approval_url);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 - Reconcile pending order (never a capture claim)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/paypal/orders/{{orderId}}/reconcile",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "paypal",
+            "orders",
+            "{{orderId}}",
+            "reconcile"
+          ]
+        },
+        "description": "Reads PayPal provider state without claiming capture. A non-approved order remains pending and cannot yield a receipt.",
+        "body": {
+          "mode": "raw",
+          "raw": "{}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body=pm.response.json();",
+              "pm.test('reconciliation responded',()=>pm.response.to.have.status(200));",
+              "pm.test('state is explicitly reported',()=>pm.expect(body.status).to.be.a('string'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "08 - Capture AFTER Personal Sandbox buyer approval (manual only)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/paypal/orders/{{orderId}}/capture",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "paypal",
+            "orders",
+            "{{orderId}}",
+            "capture"
+          ]
+        },
+        "description": "MANUAL: First open the approvalUrl in a separate Personal Sandbox buyer account, distinct from merchant. Never run this with merchant credentials or without approval. A 200 response can still be pending. Do not fabricate a capture.",
+        "body": {
+          "mode": "raw",
+          "raw": "{}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body=pm.response.json();",
+              "pm.test('explicit provider outcome',()=>pm.expect(body).to.have.property('status'));",
+              "if(body.status==='captured'){pm.test('only provider-confirmed capture is success',()=>{pm.response.to.have.status(200);pm.expect(body.receipt_id).to.be.a('string');});if(body.receipt_id)pm.environment.set('receiptId',body.receipt_id);}else{pm.test('no false captured assertion',()=>pm.expect(body.status).to.not.eql('captured'));}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "09 - Read donor finance after captured payment",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/finance?view=donor",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "finance?view=donor"
+          ]
+        },
+        "description": "Authenticates via the same demo session. Inspect only actual verified receipts and captures; never seed fake successful donations."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('donor finance API responds',()=>pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "10 - Fetch a verified receipt by ID (if available)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/receipts/{{receiptId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "receipts",
+            "{{receiptId}}"
+          ]
+        },
+        "description": "Requires a confirmed receipt ID from a genuine provider capture; a missing or unowned receipt must be denied."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('authorized receipt lookup',()=>pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "11 - Reject invalid $0 order (negative test)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/paypal/orders",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "paypal",
+            "orders"
+          ]
+        },
+        "description": "A zero-dollar checkout must be rejected before calling PayPal or crediting any ledger.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"purpose\": \"campaign\",\n  \"campaign_id\": \"{{campaignId}}\",\n  \"amount_cents\": 0,\n  \"key\": \"{{invalidCheckoutKey}}\",\n  \"checkout_method\": \"paypal\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('invalid money is rejected',()=>pm.expect(pm.response.code).to.be.within(400,499));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "12 - Status after testing (must still be sandbox)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/status",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "status"
+          ]
+        },
+        "description": "Prove these API requests did not enable live transactions, payouts or subscriptions."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body=pm.response.json();",
+              "pm.test('sandbox still isolated',()=>pm.expect(body.mode).to.eql('sandbox'));",
+              "pm.test('withdrawals remain disabled',()=>pm.expect(body.withdrawals_enabled).to.eql(false));"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://ifund-hackathon-demo.interplanetary-fund.workers.dev",
+      "type": "string"
+    },
+    {
+      "key": "campaignId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "demoHandle",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "demoPassword",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "checkoutKey",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "invalidCheckoutKey",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "orderId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "receiptId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "approvalUrl",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "releaseSha",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
