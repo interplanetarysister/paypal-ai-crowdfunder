@@ -1630,3 +1630,31 @@ footer .brand small {
   .public-analytics-grid { max-width: calc(100vw - 36px); }
   .public-ag-grid { min-width: 780px; }
 }
+
+
+/* Judge walkthrough overlays: focus a real clickable control without intercepting clicks. */
+.judge-coach { position:fixed;right:18px;bottom:18px;z-index:9950;width:min(390px,calc(100vw - 24px));padding:18px;border:2px solid #38d9ec;border-radius:20px;background:#08162b;color:#f0f8ff;box-shadow:0 16px 50px #030a1ac9;line-height:1.45;text-align:left; }
+.judge-coach h2 {font-size:20px;color:#fff;margin:10px 0 6px;}
+.judge-coach p {font-size:14px;margin:4px 0 10px;color:#cde3f5;}
+.judge-coach-head {display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:13px;font-weight:750;color:#a5ebf2;}
+.judge-coach-head span {display:flex;align-items:center;gap:7px;}
+.judge-coach-head button {padding:8px;color:#fff;min-width:40px;min-height:40px;}
+.judge-progress {height:6px;border-radius:99px;background:#314660;overflow:hidden;margin-top:7px;}
+.judge-progress span {display:block;height:100%;border-radius:99px;background:#38d9ec;transition:width .3s;}
+.judge-hint {font-weight:600;color:#7cedee!important;}
+.judge-coach-actions {display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;}
+.judge-coach-actions button {display:inline-flex;align-items:center;justify-content:center;gap:5px;font-size:13px;min-height:42px;}
+.judge-coach-actions button:disabled {opacity:.45;}
+.judge-footnote {font-size:11px!important;color:#9eb4ca!important;margin:10px 0 0!important;}
+.judge-visual-ring {position:fixed;z-index:9920;pointer-events:none;border:4px solid #11e7ff;border-radius:36px;box-shadow:0 0 0 8px #11e7ff2a,0 0 23px 8px #04cee9bd;animation:judge-pulse 1.9s ease-in-out infinite;}
+.judge-circled-target {scroll-margin:180px;outline:3px solid #00d9f0!important;outline-offset:5px;position:relative;z-index:1;}
+.judge-start {border:2px solid #0895a8!important;}
+@keyframes judge-pulse {0%,100% {box-shadow:0 0 0 5px #11e7ff1f,0 0 14px 3px #04cee98e;}50%{box-shadow:0 0 0 14px #11e7ff19,0 0 24px 12px #04cee9bd;}}
+@media (max-width:660px) {
+ .judge-coach{left:10px;right:10px;bottom:calc(9px + env(safe-area-inset-bottom));width:auto;padding:12px 14px;border-radius:15px;}
+ .judge-coach h2{font-size:17px;}
+ .judge-coach p{font-size:12px;}
+ .judge-coach-actions button{min-height:40px;}
+ .judge-coach-head button{min-height:36px;}
+}
+@media (prefers-reduced-motion:reduce) {.judge-visual-ring,.judge-progress span{animation:none!important;transition:none!important;}}
