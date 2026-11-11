@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { api, post, money } from "./api";
-import { mayCaptureSandboxCard } from "./sandbox-liability";
+import { mayCaptureSandboxCard } from "./sandbox-liability.ts";
 
 // Card numbers, expiry and CVV are entered ONLY in PayPal-hosted iframes.
 // Do not add inputs, logging, telemetry, test fixtures or backend fields for PAN/CVV.
