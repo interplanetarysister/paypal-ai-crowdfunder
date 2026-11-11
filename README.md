@@ -1,77 +1,68 @@
-# Crowdfunder — What if? (PayPal AI Hackathon 2026)
+# Interplanetary Fund — PayPal Sandbox + AI demo
 
-A **runnable, sandbox-only, AI-assisted crowdfunding demonstration**, developed independently from the live Interplanetary Fund service. The locally trained multinomial Naive Bayes model classifies campaign needs and suggests an audience; reviewed campaign copy then leads into a **real PayPal Sandbox Orders v2 checkout** when the tester provides their own free sandbox API credentials. No live money, automatic payouts, platform affiliations, metered AI API credits, or user-account migration are involved.
+An independent IFund demonstration with fictional campaigns, a real-model campaign wizard, PayPal Sandbox Orders v2, isolated accounting and receipts. **Provider acceptance is recorded separately from implementation and mocked tests.** No real funds, production users, withdrawals or payouts.
 
-**Status (October 25, 2026):** the guided AI-to-saved-campaign flow was exercised in an isolated local browser environment, and the three Node integration tests passed in a local source copy. An optional browser recorder generated a 38-second AI walkthrough (not a PayPal checkout video). Real PayPal sandbox capture, webhook delivery, an end-to-end payment demonstration, and the public YouTube video are **not yet verified**. This repository is not evidence of a completed PayPal test or Devpost submission.
+This repository evolves the earlier local Crowdfunder demo into the IFund visual experience. The old implementation remains available in Git history; it is not the active deployed runtime. GitHub's connected integration could not create another repository, so this already separate public demo repository is reused. Production repositories are unchanged.
 
-## Requirements
+- Judge walkthrough: `/hackathon` on the verified deployment listed in [RELEASE.md](docs/RELEASE.md).
+- Existing submitted entry: https://devpost.com/software/interplanetary-fund-5pznwy
+- Existing public video: https://www.youtube.com/watch?v=HkxIFqoEKs0 — approximately two minutes; coverage of this standalone sandbox release requires separate verification.
+- Official rules: https://paypalaihackathon.devpost.com/rules
+- License: [GNU AGPL-3.0](LICENSE). [Attribution and provenance](docs/PROVENANCE.md).
 
-- Node.js **20+**. No `npm install` needed: all runtime and tests use built-in Node APIs.
-- For real sandbox checkout: a free PayPal Developer account at https://developer.paypal.com/ and sandbox REST app credentials.
-- A browser that supports the PayPal JavaScript SDK (load internet when testing checkout).
+## What runs
 
-## Run locally
+- React frontend adapted from the original IFund hero, branding, campaign-card patterns and workflows.
+- Dedicated Cloudflare Worker: secure demo sessions, ownership checks, PayPal Sandbox API calls, authenticated Workers AI requests, reconciliation and private tracker.
+- Supabase: **only `ifund_demo_*` tables**, all with RLS and revoked direct browser grants. No production Auth identities are created. Demo identities are fictional handles with salted PBKDF2 passwords and opaque HttpOnly session cookies.
+- Dedicated R2 bucket for uploads and generated artwork.
+- Dedicated Supabase Edge gateway authenticated with a separate demo ECDSA key. Database service credentials stay inside Supabase. A direct server-only Supabase key is also supported for local setup.
+- AI text model: `@cf/meta/llama-3.2-3b-instruct`; artwork: `@cf/black-forest-labs/flux-1-schnell`. No canned successful fallback.
 
-```bash
-cp .env.example .env
-# Edit .env with your own PayPal sandbox CLIENT_ID / CLIENT_SECRET (never commit).
-# Optional: PAYPAL_WEBHOOK_ID for verified inbound webhook testing.
-set -a; . ./.env; set +a
-node server.mjs
-# Open http://127.0.0.1:3000
+## Run and verify locally
+
+Node 24+, npm, PostgreSQL/Supabase and a free Cloudflare account are required for the full integration.
+
+```sh
+npm ci
+npm run check
+npx playwright install chromium
+npm run test:browser
 ```
 
-Without credentials the app remains runnable: select **Try a guided example**, generate a local AI-assisted draft, select among three suggested titles, edit and save the demo campaign, and explore the saved cards. Donation buttons clearly remain disabled. To test **real PayPal sandbox payment capture**, set both `PAYPAL_CLIENT_ID` and `PAYPAL_CLIENT_SECRET`, restart, click Donate on a campaign, and authenticate using a **PayPal sandbox personal buyer**, not a live account. The server validates Sandbox OAuth credentials on page load (without creating or capturing a payment), receives and checks completed PayPal capture records before changing visible totals, and offers a safe **Retry capture verification** button if the payment response is interrupted. A declined funding method restarts PayPal approval without crediting a donation. A successful OAuth check is not proof of a payment.
+Tests use a real local PostgreSQL engine (PGlite) and explicitly mocked provider responses. They never establish real PayPal or AI acceptance. The application bundle imports none of the test provider code.
 
-## Guided demonstration and optional real-browser recording
+For a configured local environment, copy `.env.example` to **`.dev.vars`** (ignored), configure your own Supabase server key and sandbox credentials, set `DEMO_ORIGIN=http://localhost:8787`, and apply `db/001_demo.sql` and optionally `db/002_fictional_campaigns.sql` to an isolated database. Use the same browser hostname throughout. Local PayPal return/webhook testing requires a securely configured public HTTPS demo origin; localhost cannot receive public PayPal webhooks.
 
-See **[Demo runbook](docs/DEMO_RUNBOOK.md)** for the step-by-step guided example, isolated local Playwright recording, true sandbox verification checklist, and a timed under-three-minute video script. A no-credentials browser recording proves only the interactive AI campaign flow. It is **not** evidence of a completed PayPal sandbox purchase, live webhook, YouTube upload, or Devpost submission.
-
-The optional recorder requires Python Playwright and a Chromium browser (not required by the app):
-
-```bash
-python3 -m pip install playwright
-python3 -m playwright install chromium
-python3 scripts/record_demo.py
+```sh
+npm run build
+npm run dev:api
+# Open http://localhost:8787
 ```
 
-The recorder starts a fresh local server with temporary campaign storage and explicitly unsets all PayPal credentials; it saves a real-browser walkthrough to an ignored `demo-artifacts/` directory. No paid API or GitHub Actions usage is required.
+For frontend hot reload, run `npm run dev` separately; its `/api` proxy points to port 8787. Set `DEMO_ORIGIN` to the frontend origin while using that proxy. Workers AI has no local fake-success mode. Remote inference needs an explicitly configured authenticated Workers AI binding; use a deployed free-tier demo for real-model tests.
 
-## Sandbox webhook
+Do not apply these migrations blindly to a database where the same demo tables already exist. The deployed shared-project fallback was reconciled before applying only these additive migrations. Never run any migration from a production repository as part of this demo.
 
-Configure a sandbox webhook on your PayPal app with a publicly reachable **HTTPS** endpoint `/api/webhooks/paypal` and the event `PAYMENT.CAPTURE.COMPLETED`. This localhost-only prototype deliberately cannot accept public inbound webhooks by default. To test inbound delivery without exposing the unauthenticated demo to the internet, use a secured, temporary developer tunnel and tear it down afterwards; the prototype does not provision one automatically. Set `PAYPAL_WEBHOOK_ID` to the webhook's ID. The server verifies PayPal's signature via PayPal's verification API and independently retrieves the order details before recording a related capture. Unmatched events are only audit-marked, never credited.
+## Configure and deploy
 
-## Tests
+See [SETUP.md](docs/SETUP.md) for the exact server bindings, separate gateway signing key, sandbox webhook, admin bootstrap and reproducible deployment. The checked-in Wrangler configuration keeps AI and payments **off by default**. Account-specific resource IDs must be changed for another owner. No DNS or production Worker modification is required.
 
-```bash
-npm test
+```sh
+npm run build
+npx wrangler deploy --dry-run
+# After securely configuring the isolated bindings:
+npx wrangler deploy --keep-vars --var RELEASE_SHA:$(git rev-parse HEAD)
 ```
 
-No GitHub Actions workflow is installed and this project does not spend CI minutes automatically. Tests run against a local **mock PayPal service**, not the live PayPal sandbox. They cover local AI classification, server-calculated amount boundaries, cross-origin rejection, capture verification, exactly-once credit, signature rejection, webhook replay, mismatched-capture refusal, static demo assets, the draft-to-saved-campaign flow, denied payment when no sandbox credentials are present, local campaign persistence, Sandbox OAuth readiness against a mock provider, CSP nonce protection, declined funding recovery, and capture retry after interrupted API responses.
+The manual deployment workflow only targets `ifund-hackathon-demo`. It requires repository secrets and does not change production DNS or enable paid plans. The connector-based deployment uses `scripts/build-worker.mjs` to include static files as modules when the API connector cannot provide asset-session authorization headers.
 
-## Architecture
+## Payment truth
 
-- `server.mjs`: single-process HTTP service and routes, binds to `127.0.0.1` only (local demo, not a public production app).
-- `src/ai.mjs`: trained multinomial Naive Bayes classifier plus fact-preserving copy assembly. This **is a small local statistical ML model, not an LLM**. Categories and audience are probabilistic suggestions; the user edits and approves all campaign copy.
-- `src/paypal.mjs`: sandbox OAuth client credentials, Orders v2 create/lookup/capture, webhook verify-signature API. Secret stays on the server. Production endpoint is intentionally forbidden.
-- `src/store.mjs`: JSON-backed atomic persistence; an in-process serial mutation queue helps avoid duplicate local credits. This is a one-process demo, **not** a production multi-instance ledger or custody solution.
-- `public/*`: responsive interface, text-only local rendering; official PayPal JS SDK embeds checkout only when configured.
+The browser selects an amount from a validated $1–$100 range. The server pins that amount, purpose, campaign and idempotency key before creating the PayPal order. The sandbox provider's merchant is pinned from an authenticated order GET. Capture validates order, merchant, currency, amount, reference and completed capture. One Postgres transaction writes the immutable capture, balanced ledger and receipt. Webhooks are signature-verified through PayPal and deduplicated by event ID. Capture persistence does not wait for a webhook.
 
-Payment integrity rule: customer-submitted campaign and amount are pinned when an order is created. Only a matching completed PayPal order and completed capture are inserted once, keyed by capture ID. Server verifies currency, campaign, amount, and capture state; a webhook event is not itself proof of paid funds. It never updates live IFund money.
+Pending, cancelled, failed and unverified requests are not collected funds. Platform support has a null campaign relationship and separate ledger account. Subscriptions, advanced card fields, Venmo and social publishing are unavailable. PayPal determines eligible sandbox checkout methods. The 7% withdrawal fee is a labeled arithmetic preview; no payout endpoint exists.
 
-## Limits and safety
+## Judge instructions and compliance
 
-This prototype has no user authentication, donor accounts, rate limiting, chargebacks/refunds, webhooks-on-real-public-host, KYC, fund custody, payment facilitation, or real payouts. **Do not deploy it for live fundraising.** Use sandbox accounts only. PayPal trademarks and third-party content remain the property of their owners. This project does not claim a partnership with PayPal. No sensitive credentials or payment information should be committed to GitHub. The local classifier relies on a small example dataset and must not be described as a large language model.
-
-## Hackathon submission checklist
-
-- [x] Public repo with Apache-2.0 license and full runnable source (once code committed)
-- [x] Real PayPal Sandbox Orders v2 integration coded; mock-API tests passing
-- [x] AI model used to suggest category and audience; user controls campaign story
-- [x] Complete local setup instructions; no hosting needed by official rules
-- [ ] Verify one **actual** PayPal sandbox order/capture end to end using developer credentials
-- [ ] Validate signed live webhook delivery/replay through temporary approved HTTPS route
-- [ ] Record functioning project on target device and publicly upload **under 3-minute video to YouTube**
-- [ ] Complete and submit the Devpost form before **November 12, 2026, noon PST**
-
-Official event and rules: https://paypalaihackathon.devpost.com/rules
+Read [JUDGE_TESTING.md](docs/JUDGE_TESTING.md), [COMPLIANCE.md](docs/COMPLIANCE.md), [VIDEO.md](docs/VIDEO.md) and the dated [release evidence](docs/RELEASE.md). This source is not a certification of eligibility or completed provider testing. The existing Devpost submission is preserved until a reviewed update is authorized and verified.

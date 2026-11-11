@@ -1,0 +1,8 @@
+{
+  "key_ops": ["verify"],
+  "ext": true,
+  "kty": "EC",
+  "x": "mCbyadb_k8eJV6YT7nMvFWp7He98zS_38j-qRadvX5Y",
+  "y": "RJmnHLA1_Tnngkt3BM2AWo1eK21IqidH1783Kquqpu4",
+  "crv": "P-256"
+}
