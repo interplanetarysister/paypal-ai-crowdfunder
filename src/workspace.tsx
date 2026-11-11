@@ -13,6 +13,7 @@ import {
 import { api, money, type Campaign } from "./api";
 import { ErrorBox, Notice, useSession } from "./ui";
 import { useData } from "./pages";
+import { FinanceGrid } from "./finance-grid";
 interface FinanceOrder {
   id: string;
   campaign_id: string | null;
@@ -113,6 +114,10 @@ export function Dashboard() {
                 </Link>
               </div>
             ) : (
+              <>
+                <FinanceGrid orders={data.orders} receipts={data.receipts} />
+                <details className="finance-accessible-history">
+                  <summary>Accessible transaction list with receipt and reconciliation links</summary>
               <div className="transaction-list">
                 {data.orders.map((o) => {
                   const r = data.receipts.find(
@@ -156,6 +161,8 @@ export function Dashboard() {
                   );
                 })}
               </div>
+                </details>
+              </>
             )}
           </section>
         </>
