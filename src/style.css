@@ -1658,3 +1658,23 @@ footer .brand small {
  .judge-coach-head button{min-height:36px;}
 }
 @media (prefers-reduced-motion:reduce) {.judge-visual-ring,.judge-progress span{animation:none!important;transition:none!important;}}
+
+
+/* Free partner AG Charts Community donuts, separate from the public AG Grid explorer. */
+.partner-chart-section { margin: 22px 0 30px; min-width: 0; }
+.partner-charts-heading { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap; margin-bottom:14px; }
+.partner-charts-heading h2 { font-size:clamp(23px,3vw,31px); margin:6px 0; }
+.partner-charts-heading p:not(.eyebrow) { max-width:73ch; color:var(--muted); font-size:14px; }
+.partner-charts-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; align-items:stretch; }
+.partner-chart-card { min-width:0; padding:16px; }
+.partner-chart-card h3 { font-size:clamp(18px,2vw,23px); margin:7px 0 12px; }
+.partner-chart-card .demo-chart-canvas { min-height:270px; }
+.partner-chart-card .chart-values { list-style:none; }
+.partner-chart-card .chart-values li { align-items:baseline; overflow-wrap:anywhere; }
+.partner-chart-card .meta { font-size:12px; line-height:1.5; }
+.partner-chart-card .eyebrow { font-size:11px; }
+.partner-focus-select { display:block; font-weight:650; font-size:12px; margin:12px 0 7px; }
+.partner-focus-select select { display:block; width:100%; max-width:100%; border-radius:9px; min-height:44px; padding:9px; margin-top:6px; background:#f9fcff; color:#101b2b; border:1px solid #8ba8be; }
+.partner-focus-select select:focus-visible { outline:3px solid #36c7db; outline-offset:2px; }
+@media(max-width:1080px) { .partner-charts-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .partner-chart-card:last-child { grid-column:span 2; } }
+@media(max-width:700px) { .partner-charts-grid { grid-template-columns:minmax(0,1fr); } .partner-chart-card:last-child {grid-column:span 1;} .partner-charts-heading { flex-direction:column; } .partner-chart-card {padding:12px;} }
