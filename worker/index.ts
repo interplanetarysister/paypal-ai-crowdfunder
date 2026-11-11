@@ -44,7 +44,7 @@ export async function handle(
     headers.set("referrer-policy", "same-origin");
     headers.set(
       "content-security-policy",
-      "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://www.sandbox.paypal.com https://sandbox.paypal.com https://www.paypal.com; connect-src 'self' https://*.paypal.com https://*.paypalobjects.com; img-src 'self' data: blob: https://*.paypal.com https://*.paypalobjects.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src 'self' https://*.paypal.com; object-src 'none'; base-uri 'self'; form-action 'self' https://*.paypal.com; frame-ancestors 'self'",
+      "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://*.paypal.com https://*.paypalobjects.com; connect-src 'self' https://*.paypal.com https://*.paypalobjects.com; img-src 'self' data: blob: https://*.paypal.com https://*.paypalobjects.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.paypal.com https://*.paypalobjects.com; font-src 'self' https://fonts.gstatic.com https://*.paypalobjects.com; frame-src 'self' https://*.paypal.com https://*.paypalobjects.com; object-src 'none'; base-uri 'self'; form-action 'self' https://*.paypal.com; frame-ancestors 'self'",
     );
     if (!path.startsWith("/embed/"))
       headers.set("x-frame-options", "SAMEORIGIN");
