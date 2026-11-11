@@ -377,9 +377,10 @@ export function Showcase() {
             Atlas marker, QR link and embed preview.
           </li>
           <li>
-            Use only PayPal Personal sandbox buyer credentials from your own
-            developer sandbox or a securely supplied judge test account. Never
-            enter real funding details.
+            On campaign checkout, choose a PayPal Personal sandbox buyer
+            account, or test the PayPal-hosted Card Fields if this sandbox
+            merchant is eligible. Enter only PayPal-generated test-card details
+            into the hosted fields; never use a real card.
           </li>
           <li>
             Approve, return and capture. Record the real PayPal sandbox order
@@ -396,9 +397,11 @@ export function Showcase() {
           </li>
         </ol>
         <p>
-          Guest/card eligibility, advanced card fields, recurring billing,
-          social publishing and AI image improvement have not been verified and
-          are unavailable.
+          PayPal Card Fields SDK v6 is implemented, but real card approval,
+          declines and 3-D Secure outcomes remain unverified until provider
+          receipts are recorded. The form appears only when PayPal confirms
+          sandbox merchant eligibility. Recurring billing, social publishing
+          and AI image improvement remain unverified or unavailable.
         </p>
       </section>
       <section className="panel">
