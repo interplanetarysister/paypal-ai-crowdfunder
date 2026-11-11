@@ -405,5 +405,5 @@ test("sandbox Card Fields: token, method isolation, approval, capture and exactl
   );
   assert.deepEqual(balance.rows, [{ n: 2, total: 0 }]);
   assert.equal((await h.pg.query("select * from public.ifund_demo_receipts")).rows.length, 1);
-  assert.equal((await h.pg.query("select checkout_method from public.ifund_demo_orders")).rows[0].checkout_method, "card");
+  assert.equal((await h.pg.query<{ checkout_method: string }>("select checkout_method from public.ifund_demo_orders")).rows[0].checkout_method, "card");
 });
