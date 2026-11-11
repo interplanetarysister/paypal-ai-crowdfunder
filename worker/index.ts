@@ -171,7 +171,7 @@ export async function handle(
       );
       return json({ campaigns: await withTotals(db, campaigns) });
     }
-    const focusMatch = path.match(/^\\/api\\/campaigns\\/([0-9a-f-]{36})\\/focus$/);
+    const focusMatch = path.match(/^\/api\/campaigns\/([0-9a-f-]{36})\/focus$/);
     if (focusMatch && request.method === "GET") {
       const found = await db.rows<{ id: string }>(
         "campaigns",
