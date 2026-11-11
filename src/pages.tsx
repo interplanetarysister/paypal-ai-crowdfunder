@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useParams, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import {
   ArrowRight,
   Check,
@@ -478,6 +478,7 @@ interface ReceiptResult {
   message?: string;
 }
 export function Checkout({ support = false }: { support?: boolean }) {
+  const navigate = useNavigate();
   const [q] = useSearchParams(),
     campaignId = q.get("campaign"),
     orderId = q.get("id");
@@ -649,6 +650,9 @@ export function Checkout({ support = false }: { support?: boolean }) {
               setError("");
               setReceipt(result);
               setMessage("Sandbox card capture and receipt confirmed by PayPal and IFund.");
+              // Card checkouts have no PayPal redirect query parameter; navigate
+              // explicitly so the verified receipt is visible to the donor.
+              navigate("/receipts/" + encodeURIComponent(result.receipt_id));
             }}
           />
           {!status?.payments_configured && (
