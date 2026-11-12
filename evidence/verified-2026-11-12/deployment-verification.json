@@ -1,0 +1,32 @@
+{
+  "observed_at": "2026-11-12T12:46:00Z",
+  "demo": {
+    "url": "https://ifund-hackathon-demo.interplanetary-fund.workers.dev/hackathon",
+    "verified_runtime_sha": "4c2700439b2dff0d3e3fc3b89b182b8abda9dca3",
+    "sandbox": true,
+    "withdrawals": false,
+    "subscriptions": false,
+    "query_string_redaction": true,
+    "bindings_unchanged": true
+  },
+  "canonical_production": {
+    "url": "https://interplanetaryfund.com/hackathon",
+    "sha": "9c02b1e485eb020ec5058946c5f0e8218f13e223",
+    "deployment_id": "015e985d-2756-44c7-b5c9-83734102c7db",
+    "status": "success",
+    "desktop_mobile_smoke": "passed"
+  },
+  "base44": {
+    "live_donation_count": 0,
+    "live_financial_operation_count": 0,
+    "source_repairs_pr": "https://github.com/interplanetarysister/interplanetary-fund2/pull/550",
+    "promotion_gate": "pending dependency review"
+  },
+  "production_payments": {
+    "existing_flag": "true",
+    "existing_mode": "live",
+    "configuration_changed_by_this_release": false,
+    "live_charge_executed": false
+  },
+  "billing": "No paid upgrade authorized or enabled"
+}

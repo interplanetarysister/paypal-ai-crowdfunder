@@ -1,0 +1,107 @@
+[
+  {
+    "path": "/",
+    "width": 1440,
+    "http": 200,
+    "h1": "Endless possibilities start\nwith one question:\nWhat if?",
+    "horizontal_overflow": false,
+    "a11y_violations": []
+  },
+  {
+    "path": "/discover",
+    "width": 1440,
+    "http": 200,
+    "h1": "Explore causes",
+    "horizontal_overflow": false,
+    "a11y_violations": []
+  },
+  {
+    "path": "/hackathon",
+    "width": 1440,
+    "http": 200,
+    "h1": "From “What if?”\nto a verified possibility.",
+    "horizontal_overflow": false,
+    "a11y_violations": []
+  },
+  {
+    "path": "/map",
+    "width": 1440,
+    "http": 200,
+    "h1": "Atlas of possibility",
+    "horizontal_overflow": false,
+    "a11y_violations": []
+  },
+  {
+    "path": "/",
+    "width": 768,
+    "http": 200,
+    "h1": "Endless possibilities start\nwith one question:\nWhat if?",
+    "horizontal_overflow": false,
+    "a11y_violations": []
+  },
+  {
+    "path": "/discover",
+    "width": 768,
+    "http": 200,
+    "h1": "Explore causes",
+    "horizontal_overflow": false,
+    "a11y_violations": []
+  },
+  {
+    "path": "/hackathon",
+    "width": 768,
+    "http": 200,
+    "h1": "From “What if?”\nto a verified possibility.",
+    "horizontal_overflow": false,
+    "a11y_violations": []
+  },
+  {
+    "path": "/map",
+    "width": 768,
+    "http": 200,
+    "h1": "Atlas of possibility",
+    "horizontal_overflow": false,
+    "a11y_violations": []
+  },
+  {
+    "path": "/",
+    "width": 390,
+    "http": 200,
+    "h1": "Endless possibilities start\nwith one question:\nWhat if?",
+    "horizontal_overflow": false,
+    "a11y_violations": []
+  },
+  {
+    "path": "/discover",
+    "width": 390,
+    "http": 200,
+    "h1": "Explore causes",
+    "horizontal_overflow": false,
+    "a11y_violations": []
+  },
+  {
+    "path": "/hackathon",
+    "width": 390,
+    "http": 200,
+    "h1": "From “What if?”\nto a verified possibility.",
+    "horizontal_overflow": false,
+    "a11y_violations": []
+  },
+  {
+    "path": "/map",
+    "width": 390,
+    "http": 200,
+    "h1": "Atlas of possibility",
+    "horizontal_overflow": false,
+    "a11y_violations": []
+  },
+  {
+    "anonymous_tracker": "sign-in-required"
+  },
+  {
+    "authenticated_dashboard": "loaded"
+  },
+  {
+    "admin_tracker": "loaded"
+  }
+]

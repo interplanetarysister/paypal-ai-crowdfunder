@@ -1,0 +1,74 @@
+[
+  {
+    "root": "https://interplanetaryfund.com",
+    "path": "/",
+    "width": 1440,
+    "http": 200,
+    "overflow": false,
+    "has_independent_guide": null,
+    "title": "Interplanetary Fund — What If?"
+  },
+  {
+    "root": "https://interplanetaryfund.com",
+    "path": "/hackathon",
+    "width": 1440,
+    "http": 200,
+    "overflow": false,
+    "has_independent_guide": 1,
+    "title": "Interplanetary Fund — What If?"
+  },
+  {
+    "root": "https://interplanetaryfund.com",
+    "path": "/discover",
+    "width": 1440,
+    "http": 200,
+    "overflow": false,
+    "has_independent_guide": null,
+    "title": "Interplanetary Fund — What If?"
+  },
+  {
+    "root": "https://interplanetaryfund.com",
+    "path": "/login",
+    "width": 1440,
+    "http": 200,
+    "overflow": false,
+    "has_independent_guide": null,
+    "title": "Interplanetary Fund — What If?"
+  },
+  {
+    "root": "https://interplanetaryfund.com",
+    "path": "/",
+    "width": 390,
+    "http": 200,
+    "overflow": false,
+    "has_independent_guide": null,
+    "title": "Interplanetary Fund — What If?"
+  },
+  {
+    "root": "https://interplanetaryfund.com",
+    "path": "/hackathon",
+    "width": 390,
+    "http": 200,
+    "overflow": false,
+    "has_independent_guide": 1,
+    "title": "Interplanetary Fund — What If?"
+  },
+  {
+    "root": "https://interplanetaryfund.com",
+    "path": "/discover",
+    "width": 390,
+    "http": 200,
+    "overflow": false,
+    "has_independent_guide": null,
+    "title": "Interplanetary Fund — What If?"
+  },
+  {
+    "root": "https://interplanetaryfund.com",
+    "path": "/login",
+    "width": 390,
+    "http": 200,
+    "overflow": false,
+    "has_independent_guide": null,
+    "title": "Interplanetary Fund — What If?"
+  }
+]

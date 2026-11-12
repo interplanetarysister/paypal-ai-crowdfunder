@@ -41,7 +41,7 @@ All five requests returned HTTP200 and `execution.status=succeeded`. Text uses `
 
 ## Deployment and compliance limits
 
-The Worker release SHA is read from `/api/status` and the corresponding GitHub release commit; deployment verification is recorded separately after upload. It has dedicated Workers AI, R2 media, demo database signer and Sandbox Secrets Store references. Secret values are never logged or committed. Setup remains disabled; withdrawals, payouts and subscriptions are unavailable.
+The verified Worker runtime SHA is `4c2700439b2dff0d3e3fc3b89b182b8abda9dca3`. The canonical production frontend was independently deployed from `9c02b1e485eb020ec5058946c5f0e8218f13e223` (Cloudflare deployment `015e985d-2756-44c7-b5c9-83734102c7db`) and passed desktop/phone home, guide, discovery and login checks. See `evidence/verified-2026-11-12/deployment-verification.json`. Query-string redaction is explicitly enabled; bindings were verified unchanged. It has dedicated Workers AI, R2 media, demo database signer and Sandbox Secrets Store references. Secret values are never logged or committed. Setup remains disabled; withdrawals, payouts and subscriptions are unavailable.
 
 GitHub Actions is **blocked externally**: GitHub's annotation says jobs were not started because the account is locked due to a billing issue. Local checks and actual Cloudflare builds are independent evidence; Actions is not described as passing. No paid plan or billing change was made.
 
