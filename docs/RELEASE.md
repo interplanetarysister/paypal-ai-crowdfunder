@@ -1,88 +1,52 @@
-# Hackathon release evidence — November 11, 2026
+# Verified release evidence — November 12, 2026
 
-## Additional security and no-cost route audit (November 11, ~09:48 PST)
+Judge entry: <https://ifund-hackathon-demo.interplanetary-fund.workers.dev/hackathon>
+Public source: <https://github.com/interplanetarysister/paypal-ai-crowdfunder>
 
-- All 15 isolated `ifund_demo_*` tables have RLS enabled and deny direct `anon`/`authenticated` SELECT/INSERT grants. The internal `ifund_demo_seed_focus_for_campaign()` trigger's default public EXECUTE grant was revoked in the live database; after verification only `service_role` retained EXECUTE. Repository migration `db/004_simulated_agent_focus.sql` now contains the same grants.
-- Independent external HTTPS tests returned **200** for `/hackathon`, `/hackathon/analytic`, `/hackathon/analytics`, `/map`, `/create`, and `/login` (SPA HTML delivered). This checks routing/hosting, **not** full client-side functionality.
-- Unauthenticated requests to `/api/paypal/status`, `/api/finance`, `/api/admin/tracker`, and `/api/campaigns?mine=1` returned **401**, while `/api/status` and public `/api/campaigns` returned **200**. An unsigned checkout POST without Origin returned **403**; unsigned webhook POST returned **400**. Authenticated cross-user object-level authorization still needs browser testing.
-- Latest Workers AI ledger: **13 succeeded, 6 failed (19 total)**. Successful generation spans titles, descriptions, story, individual sections and two Flux image runs; two media records exist. Image display/permissions and full new-organizer journey remain unverified.
-- GitHub Actions jobs still fail **before runner assignment** with zero steps; reports from GitHub community describe identical symptoms for billing/entitlement blocks but that account-specific root cause is **not confirmed**. Cloudflare direct deployment is the verified working release path; do not claim CI green.
+This report supersedes the November 11 partial snapshots preserved in Git history. It distinguishes real provider acceptance from mocked automated tests. It does not certify personal eligibility or footage in the existing submitted video.
 
-## Latest independently checked release (November 11, ~09:35 PST)
+## Real PayPal Sandbox acceptance
 
-- **Deployed** Cloudflare Worker and frontend bundle identify GitHub commit `ae613457144eaebca09a1d7332f94c6590306723`, verified by independent public HTTPS probes. The homepage bundle contains the evidence-aware acceptance notice instead of a static blanket failure.
-- `GET /api/status` and `GET /api/campaigns` returned HTTP 200; sandbox, AI, R2 and storage bindings are configured. These flags are not proof of every provider operation.
-- Fresh isolated database query: **4 PayPal Sandbox orders; 2 provider-COMPLETED captures (USD $1.00 and $25.00); 2 matching receipts; 4 ledger rows with net 0; 2 recorded `PAYMENT.CAPTURE.COMPLETED` events.** Two orders remain unapproved/created and are not counted as donations.
-- Deployed server handler validates PayPal order/payee/currency/amount and completed capture before calling the durable finalization RPC; webhook handler requires `verification_status === "SUCCESS"` from PayPal before event persistence. An unsigned webhook POST returned HTTP 400 and unauthenticated PayPal status returned HTTP 401.
-- **The buyer-account approval UI has not been independently witnessed during this audit.** Provider-initiated fresh signed webhook redelivery, card-fields/3DS provider acceptance, cross-account browser security, and video parity are separate gates and remain open. Do not label the entire demo fully accepted.
-- **CI caveat:** GitHub Actions jobs fail before runner assignment (`runner_id=0`, no executed steps); actual Cloudflare Worker deployment succeeded independently. Investigate GitHub-hosted runner entitlement/billing/availability; do not represent those CI runs as passed.
-- Devpost's current submitted website is the guided demo `/hackathon` and description identifies the public AGPL repo, PayPal Sandbox/AI models, AG Grid/Charts and judge instructions. Video footage parity is still unverified.
+The saved Personal Sandbox buyer was used in the actual PayPal approval UI, distinct from the merchant. No buyer credentials are published. The Worker captured and verified provider responses, then persisted the canonical records before webhook arrival.
 
-The snapshot below is historical evidence from earlier on November 11, not the latest account totals or deployed commit.
+| Purpose                            | Order             | Capture           |   USD |
+| ---------------------------------- | ----------------- | ----------------- | ----: |
+| Fictional campaign                 | 01L39374A0446100G | 58F169371D0129007 |  1.00 |
+| Fictional campaign                 | 3KP56177UN3553132 | 5HV42410W7273681D | 25.00 |
+| Organizer-owned fictional campaign | 82V95075KB818703W | 7M649558TX4441734 |  1.00 |
+| Platform support                   | 1AG37716849538918 | 3HK02038XB0342029 |  1.00 |
 
+Fresh SQL reconciliation on November 12 confirmed **4 COMPLETED captures, 4 receipts, 8 ledger rows, zero signed-cent balance**. Every capture has exactly two balanced ledger entries and one receipt; all four orders are `captured/provider_verified`. Campaign totals are **$27.00**, platform support **$1.00**. Support has a null campaign relationship. No inconsistent receipt or support relationship was found. Pending/unapproved orders are excluded.
 
-**Status: live interactive prototype; partial provider acceptance; not yet certified end-to-end judge-ready.**
+The root demo donor sees campaign $2.00 and support $1.00; its organizer view sees its campaign $1.00 and support $0.00; the administrator sees campaign $27.00 and support $1.00. Totals come from the canonical financial RPC, never synthetic successful-payment seeds.
 
-## Actual deployment and source
+PayPal event **WH-01C303736S267744J-5JS42606R8901483R** was verified on receipt, then redelivered by the real PayPal API. `delivery_count` increased to **2**, with verified timestamps **2026-11-12T12:23:09Z** and **12:26:09Z**. Counts stayed at 4 captures / 4 receipts / 8 ledger entries. Repeated capture and reconciliation returned the original capture **3HK02038XB0342029** and receipt **2c55464e-50df-4760-b623-4117fec5e2d7**. Unsigned webhook requests were rejected HTTP400.
 
-- **First page of guided demo:** https://ifund-hackathon-demo.interplanetary-fund.workers.dev/hackathon
-- **Partner charts and AG Grid:** https://ifund-hackathon-demo.interplanetary-fund.workers.dev/hackathon/analytic (alias of `/hackathon/analytics`)
-- **Atlas:** https://ifund-hackathon-demo.interplanetary-fund.workers.dev/map
-- **Public code:** https://github.com/interplanetarysister/paypal-ai-crowdfunder — GitHub API reports `private=false`, recognized `AGPL-3.0` license.
-- **Devpost submitted project:** https://devpost.com/software/interplanetary-fund-5pznwy
-- **Prior live release commit:** `2a55c33ca83502a20b033aed2a86a31ca9fa2993`. New changes must pass the Cloudflare production build and release checks before this document can claim a newer deployed SHA.
-- Cloudflare bindings inspected without exposing values: `DEMO_ENABLED=true`, `AI_ENABLED=true`, dedicated Sandbox PayPal Secrets Store, PayPal webhook ID, isolated DB signer, Workers AI and R2.
-- Live Cloudflare browser on the prior release confirmed `/hackathon/analytic` renders three AG Charts canvases, ten AG Grid table rows and no chart errors on desktop (1280px) and mobile (390px). The nine-to-ten-step cyan highlighted judge tour was separately browser-verified at its entry step.
-- Previous release completed **17/17 automated tests**, including real local PGlite isolation tests with mocked PayPal and AI. The later Postman-contract tests must pass a **new** deployment to be counted.
+Sanitized evidence: [verified-2026-11-12](../evidence/verified-2026-11-12/). Provider IDs are genuine sandbox references. No real funds transferred.
 
-## Isolated Supabase audit (read only, November 11)
+## Real AI and campaign acceptance
 
-| Evidence | Observed |
-| --- | ---: |
-| Published fictional campaigns | 82 |
-| PayPal Sandbox orders | 3 |
-| Provider-method captured orders | 1 |
-| Persisted captures | 1 |
-| Receipts | 1 |
-| Ledger rows | 2 |
-| Ledger sum of signed cents | 0 |
-| Orders using Card Fields checkout method | 0 |
-| Workers AI run attempts | 14 |
-| Workers AI successes | 8 |
-| Workers AI failures | 6 |
-| `PAYMENT.CAPTURE.COMPLETED` event records | 1 |
-| Maximum recorded delivery_count for that event | 2 |
+One new ordinary demo account completed the deployed browser wizard on November 12: five distinct selectable titles, two descriptions, a complete story, independent section regeneration, generated artwork, private draft save and publish. The published fictional campaign is [Solace Harbor demonstration](https://ifund-hackathon-demo.interplanetary-fund.workers.dev/campaign/08fc536b-0d6f-4346-b231-49e8b57bca6c).
 
-The AI audit shows successful title, description, story, single-section and image outputs across model versions. The currently deployed text adapter uses `@cf/meta/llama-3.3-70b-instruct-fp8-fast` and artwork uses `@cf/black-forest-labs/flux-1-schnell`.
+All five requests returned HTTP200 and `execution.status=succeeded`. Text uses `@cf/meta/llama-3.3-70b-instruct-fp8-fast`; images use `@cf/black-forest-labs/flux-1-schnell`. Request IDs, timestamps and real outputs are included in the allowlisted evidence. Provider failures remain failures in the private execution ledger. Seed copy is separately labeled and is not provider evidence.
 
-These database rows are meaningful existing integration evidence, **not** proof that every current visitor path was independently reproduced in a fresh PayPal Sandbox buyer browser. In particular, one recorded webhook event with delivery count two is not itself conclusive proof of fresh provider-authenticated replay acceptance. Pending/unapproved orders never count toward raised funds.
+## Automated and security checks
 
-## Gate status by feature
+- `npm run check`: lint, TypeScript, Vite build and **20/20** automated tests passed. Provider unit tests use mocks and real local PostgreSQL semantics; they are not the sandbox acceptance evidence above.
+- `CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium npm run test:browser`: **4/4** scenarios passed. Guest navigation/discovery/map/sharing, protected routes, account/wizard/draft/publication, AI failure handling, desktop1440/tablet768/phone390 and full axe scans passed. The chart and globe wrappers were repaired to expose nested interactive controls accessibly.
+- Dependency audit: **0 vulnerabilities** in the independent demo at this audit.
+- A second real demo account received HTTP404 for another donor's receipt, HTTP403 for admin finance/tracker and an empty own donor ledger. No private tracker payload is included in public evidence.
+- All 15 demo tables enforce RLS; browser roles have no direct table grants. The gateway verifies independently signed backend requests. Missing/invalid/stale signatures are tested. The internal focus trigger is service-role-only.
+- Reconciled production tables still contain **0 donations, 0 ledger rows**; production Auth remains **5 users**. Demo registration never writes production identities. Production payment settings, DNS and merchant credentials were not changed by this demo release.
 
-| Item | Status | Specific evidence / gap |
-| --- | --- | --- |
-| Independent dedicated Worker public | PASS | Official workers.dev origin deployed with guided route and partner graphs. |
-| Public Github + recognized OSS license | PASS | GitHub reports a public repo and `AGPL-3.0`. |
-| Fictional, interactive Atlas and discovery | PASS public rendering | 82 published fictional campaigns; synthetic map markers and accessible fallback. |
-| AG Charts Community and AG Grid Community | PASS public rendering | Three real chart canvases and AG Grid rows rendered on desktop/mobile; free Community editions. |
-| Separate demo logins and persisted campaigns | IMPLEMENTED; new-session QA OPEN | Salted demo session implementation, owner/write checks and automated tests. |
-| Real-model Workers AI | PARTIAL PROVIDER EVIDENCE | 8 stored successes from 14 runs; fresh all-stages user journey pending. |
-| Sandbox PayPal Orders v2 and merchant verification | PARTIAL PROVIDER EVIDENCE | One captured PayPal-method order, receipt and balanced ledger; fresh buyer/approval QA pending. |
-| Genuine signed webhook + redelivery | PARTIAL DB EVIDENCE | One completed-capture event, delivery count 2; fresh PayPal-authenticated replay not independently verified. |
-| Card Fields & 3DS | IMPLEMENTED, PROVIDER ACCEPTANCE NOT VERIFIED | No card-method orders; only if eligible merchant. |
-| Owner/admin authorization negative tests | AUTOMATED ONLY | Full browser account-isolation test still required. |
-| Postman sponsor collection | IMPLEMENTED; actual Postman run NOT VERIFIED | `postman/IFund_PayPal_AI_Sandbox.postman_collection.json`, including protected tests and no hardcoded secrets. |
-| Public video showing THIS release | NOT VERIFIED | Prior YouTube Shorts 2:01 documented; its current demo footage unverified. |
-| Devpost complete, corrected fields and links | PARTIAL | Previously submitted; the separate legacy project website field may still point at Base44. Confirm custom working-demo answer independently. |
-| Eligibility and personal attestations | OWNER ATTESTATION | Neither source code nor AI can certify personal eligibility. |
+## Deployment and compliance limits
 
-## Important boundaries
+The Worker release SHA is read from `/api/status` and the corresponding GitHub release commit; deployment verification is recorded separately after upload. It has dedicated Workers AI, R2 media, demo database signer and Sandbox Secrets Store references. Secret values are never logged or committed. Setup remains disabled; withdrawals, payouts and subscriptions are unavailable.
 
-The demo writes only `ifund_demo_*` objects, uses fictional user identities and PayPal Sandbox, and does not turn on real payouts, subscriptions or production financial ledger writes. Real `interplanetaryfund.com` analytics and Atlas are a separate Cloudflare Pages release; Base44 direct source access is gated behind the user's current workspace plan and was not used.
+GitHub Actions is **blocked externally**: GitHub's annotation says jobs were not started because the account is locked due to a billing issue. Local checks and actual Cloudflare builds are independent evidence; Actions is not described as passing. No paid plan or billing change was made.
 
-**Plan and acceptance actions:** [REMAINING_HACKATHON_PLAN.md](REMAINING_HACKATHON_PLAN.md).  
-**Judge testing:** [JUDGE_TESTING.md](JUDGE_TESTING.md).  
-**Video acceptance:** [VIDEO.md](VIDEO.md).  
-**Postman collection:** [../postman/IFund_PayPal_AI_Sandbox.postman_collection.json](../postman/IFund_PayPal_AI_Sandbox.postman_collection.json).
+The official rules/dates were re-read November 12. Submission closes **November 12 at 20:00UTC / noon Pacific**. The existing submitted entry links to the dedicated guide. The existing public YouTube video is **2:01**, under three minutes; its current-release footage coverage remains **NOT VERIFIED** because direct playback could not be inspected in this environment. No personal eligibility attestations were invented. Maintain free judge access through **December 15, 16:00UTC**.
 
-**Official deadline:** November 12, 2026 at 12:00 p.m. Pacific; judges start December 1. Do not infer certification from a successful Cloudflare deploy or static screenshots.
+Optional Card Fields/3DS and a Postman desktop run remain **NOT VERIFIED** against the provider. Their unit/contract tests do not prove merchant eligibility or actual card acceptance. Image improvement, automatic social publishing, recurring billing and payouts are accurately unavailable. These are not represented as successful live functionality.
+
+[Judge walkthrough](JUDGE_TESTING.md) · [Compliance matrix](COMPLIANCE.md) · [Video script](VIDEO.md)

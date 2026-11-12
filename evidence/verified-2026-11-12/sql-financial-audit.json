@@ -1,0 +1,21 @@
+{
+  "captures": 4,
+  "receipts": 4,
+  "ledger_rows": 8,
+  "observed_at": "2026-11-12T12:39:43.882014+00:00",
+  "rls_missing": 0,
+  "campaign_cents": 2700,
+  "ledger_balance": 0,
+  "replayed_event": {
+    "event_id": "WH-01C303736S267744J-5JS42606R8901483R",
+    "order_id": "08e2e7ef-2b50-4dea-a4c8-be6a026c2bc2",
+    "event_type": "PAYMENT.CAPTURE.COMPLETED",
+    "verified_at": "2026-11-12T12:23:09.382925+00:00",
+    "payload_hash": "d1958baca8bcceab7fa56e7def732edd31b0c7365355acbb486ee4f770e3e744",
+    "delivery_count": 2,
+    "last_verified_at": "2026-11-12T12:26:09.296803+00:00"
+  },
+  "production_ledger": 0,
+  "production_donations": 0,
+  "platform_support_cents": 100
+}

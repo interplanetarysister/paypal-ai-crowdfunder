@@ -1,0 +1,11 @@
+{
+  "status": "captured",
+  "purpose": "platform_support",
+  "currency": "USD",
+  "order_id": "1AG37716849538918",
+  "capture_id": "3HK02038XB0342029",
+  "disclosure": "PAYPAL SANDBOX — NO REAL FUNDS TRANSFERRED",
+  "receipt_id": "2c55464e-50df-4760-b623-4117fec5e2d7",
+  "amount_cents": 100,
+  "mode": "sandbox"
+}

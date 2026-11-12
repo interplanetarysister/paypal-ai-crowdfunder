@@ -67,9 +67,14 @@ test("guest navigation, discovery, synthetic map, campaign disclosures, sharing 
       new RegExp(c.id),
     );
     await page.goto("/map");
-    await page.getByRole("button", { name: /Show Restore Aurora/ }).click();
+    await page.getByRole("button", { name: "Rotate globe west" }).click();
+    await page
+      .getByRole("button", {
+        name: /Select fictional campaign: Restore Aurora/,
+      })
+      .press("Enter");
     await expect(
-      page.getByRole("link", { name: "View fictional campaign" }),
+      page.getByRole("link", { name: "Open campaign and charts" }),
     ).toBeVisible();
     await page.goto("/hackathon/tracker");
     await expect(
@@ -207,6 +212,8 @@ test("AI provider failure preserves the campaign draft and never shows fake succ
 test("desktop, tablet and phone layouts, screenshots and automated accessibility", async ({
   page,
 }) => {
+  // Eighteen full axe scans plus chart initialization exceed the single-route budget.
+  test.setTimeout(180000);
   const h = await harness();
   try {
     await h.register();
@@ -222,6 +229,7 @@ test("desktop, tablet and phone layouts, screenshots and automated accessibility
       for (const route of [
         "/",
         "/discover",
+        "/map",
         "/campaign/" + c.id,
         "/create",
         "/hackathon",

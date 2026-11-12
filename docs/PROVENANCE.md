@@ -9,21 +9,21 @@
 - Coordination: https://github.com/interplanetarysister/InterplanetaryFund/issues/203.
 - Rules: https://paypalaihackathon.devpost.com/rules, plus authenticated Devpost rules, form and dates.
 
-Base44's direct sandbox source tool returned `PREMIUM_REQUIRED` (Builder plan required). Available tools did not offer a direct duplicate endpoint; creating an empty starter would not bypass the paid direct-file restriction. No Base44 AI builder call, plan upgrade or builder credits were used. The authorized exported-source fallback was selected.
+Base44's direct sandbox source tool returned `PREMIUM_REQUIRED` (Builder plan required). The initial inspection did not expose a duplicate operation. A later official API catalog includes remix and GitHub sync/deploy operations; no remix was executed and no paid file-access restriction was bypassed. No Base44 AI builder call, plan upgrade or builder credits were used. The authorized exported-source fallback was selected.
 
 ## Reuse decisions
 
-| Capability                      | Reuse / adaptation                                                                                                                                                           |
-| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| IFund identity                  | Original logo `6d085cfd8_1000004152.webp`, existing cosmic hero archive, original wording and Fraunces/Inter typography                                                      |
-| Home, cards and navigation      | Original `Home.jsx`, `BrandHero.jsx`, `BrandLogo.jsx`, `CampaignCard.jsx` and migration styles inspected; adapted to demo-specific React routes and disclosures              |
-| PayPal validation               | Migration `paypalSandboxSecurity.js` and sandbox handler inspected; validation adapted to pinned demo intent, merchant, purpose and atomic ledger RPC                        |
-| Existing sandbox infrastructure | Only matching sandbox Secrets Store references reused; no live credential values exported or changed                                                                         |
-| Financial persistence           | Original production ledger not reused for data. New `ifund_demo_*` tables, separate demo accounts and dedicated signer/gateway                                               |
-| AI                              | Existing campaign writing flow inspected; new authenticated Workers AI adapter enforces five titles, two descriptions and one story                                          |
-| Sharing / QR                    | `qrcode.react` (ISC) for real offline QR encoding; native sharing only where supported                                                                                       |
-| Map                             | Original globe/navigation intent retained as an accessible synthetic schematic Atlas with zoom and marker links; exact original 3D globe parity is not claimed               |
-| Older PayPal demo repository    | Local classifier/single-process server preserved in Git history, replaced as active runtime because it could not meet the requested real-model + Worker + IFund architecture |
+| Capability                      | Reuse / adaptation                                                                                                                                                                                |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| IFund identity                  | Original logo `6d085cfd8_1000004152.webp`, existing cosmic hero archive, original wording and Fraunces/Inter typography                                                                           |
+| Home, cards and navigation      | Original `Home.jsx`, `BrandHero.jsx`, `BrandLogo.jsx`, `CampaignCard.jsx` and migration styles inspected; adapted to demo-specific React routes and disclosures                                   |
+| PayPal validation               | Migration `paypalSandboxSecurity.js` and sandbox handler inspected; validation adapted to pinned demo intent, merchant, purpose and atomic ledger RPC                                             |
+| Existing sandbox infrastructure | Only matching sandbox Secrets Store references reused; no live credential values exported or changed                                                                                              |
+| Financial persistence           | Original production ledger not reused for data. New `ifund_demo_*` tables, separate demo accounts and dedicated signer/gateway                                                                    |
+| AI                              | Existing campaign writing flow inspected; new authenticated Workers AI adapter enforces five titles, two descriptions and one story                                                               |
+| Sharing / QR                    | `qrcode.react` (ISC) for real offline QR encoding; native sharing only where supported                                                                                                            |
+| Map                             | Original globe/navigation intent retained as an accessible synthetic schematic Atlas with rotation, keyboard-selectable markers and campaign links; exact original 3D globe parity is not claimed |
+| Older PayPal demo repository    | Local classifier/single-process server preserved in Git history, replaced as active runtime because it could not meet the requested real-model + Worker + IFund architecture                      |
 
 ## Official examples and licenses
 

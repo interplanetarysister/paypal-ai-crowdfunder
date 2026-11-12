@@ -89,7 +89,7 @@ export function CampaignGlobe({ campaigns }: { campaigns: Campaign[] }) {
         </div>
       </header>
       <div className="globe-layout">
-        <svg className="campaign-globe" viewBox="0 0 600 600" role="img" aria-label={`Rotatable illustrative globe. ${markers.length} fictional campaign locations visible on this hemisphere.`}
+        <svg className="campaign-globe" viewBox="0 0 600 600" role="group" aria-label={`Rotatable illustrative globe. ${markers.length} fictional campaign locations visible on this hemisphere.`}
           onPointerDown={down} onPointerMove={move} onPointerUp={stop} onPointerCancel={stop}>
           <defs>
             <radialGradient id="demo-globe-sea" cx="32%" cy="24%" r="82%">

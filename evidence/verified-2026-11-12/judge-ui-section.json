@@ -1,0 +1,14 @@
+{
+  "sections": [
+    {
+      "heading": "The Need",
+      "text": "In Solace Harbor, the astronomy collective seeks a telescope library and night-sky workshops to make stargazing accessible to all, fostering a sense of community and wonder among its residents, and inspiring the next generation of space enthusiasts."
+    }
+  ],
+  "execution": {
+    "id": "c42c55bb-4672-4305-9946-c3ed1289f094",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "status": "succeeded",
+    "completed_at": "2026-11-12T12:37:12.583Z"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "record_count": 7,
+  "pending_count": 3,
+  "captured_cents": 2700,
+  "limited_to_latest": 200,
+  "platform_support_cents": 100,
+  "receipts_count": 4,
+  "captured_provider_ids": [
+    "3HK02038XB0342029",
+    "7M649558TX4441734",
+    "5HV42410W7273681D",
+    "58F169371D0129007"
+  ]
+}

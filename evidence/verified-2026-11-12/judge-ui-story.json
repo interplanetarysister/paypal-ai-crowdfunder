@@ -1,0 +1,22 @@
+{
+  "sections": [
+    {
+      "heading": "The Need",
+      "text": "Solace Harbor's astronomy collective lacks accessible telescopes and educational resources, hindering community engagement with the night sky."
+    },
+    {
+      "heading": "Our Plan",
+      "text": "We aim to establish a telescope library and offer illustrated workshops, fostering a sense of wonder and knowledge among residents."
+    },
+    {
+      "heading": "Your Impact",
+      "text": "Support will enable us to purchase telescopes, develop educational materials, and host workshops, making astronomy accessible to all in Solace Harbor."
+    }
+  ],
+  "execution": {
+    "id": "7f2f6a02-0d4f-4296-b4ad-14c4fa24d20b",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "status": "succeeded",
+    "completed_at": "2026-11-12T12:37:09.129Z"
+  }
+}

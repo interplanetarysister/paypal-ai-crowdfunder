@@ -1,0 +1,56 @@
+[
+  {
+    "kind": "titles",
+    "http": 200,
+    "execution": {
+      "id": "3e86ae8c-26c5-4f11-b9d8-d30b783d3bda",
+      "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+      "status": "succeeded",
+      "completed_at": "2026-11-12T12:37:00.657Z"
+    }
+  },
+  {
+    "kind": "descriptions",
+    "http": 200,
+    "execution": {
+      "id": "f9d5d080-fa3a-4197-8b8c-23d31094db13",
+      "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+      "status": "succeeded",
+      "completed_at": "2026-11-12T12:37:03.510Z"
+    }
+  },
+  {
+    "kind": "story",
+    "http": 200,
+    "execution": {
+      "id": "7f2f6a02-0d4f-4296-b4ad-14c4fa24d20b",
+      "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+      "status": "succeeded",
+      "completed_at": "2026-11-12T12:37:09.129Z"
+    }
+  },
+  {
+    "kind": "section",
+    "http": 200,
+    "execution": {
+      "id": "c42c55bb-4672-4305-9946-c3ed1289f094",
+      "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+      "status": "succeeded",
+      "completed_at": "2026-11-12T12:37:12.583Z"
+    }
+  },
+  {
+    "kind": "image",
+    "http": 200,
+    "execution": {
+      "id": "56ed62b7-bbbc-4d8a-9fcd-3e871c8bcac2",
+      "model": "@cf/black-forest-labs/flux-1-schnell",
+      "status": "succeeded",
+      "completed_at": "2026-11-12T12:37:16.886Z"
+    }
+  },
+  {
+    "published_url": "https://ifund-hackathon-demo.interplanetary-fund.workers.dev/campaign/08fc536b-0d6f-4346-b231-49e8b57bca6c",
+    "elapsed_ms": 23080
+  }
+]

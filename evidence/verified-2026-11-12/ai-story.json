@@ -1,0 +1,22 @@
+{
+  "sections": [
+    {
+      "heading": "The Need",
+      "text": "Aurora Harbor's community learning center was damaged in a synthetic storm. Residents lack a safe space for education and growth."
+    },
+    {
+      "heading": "Our Plan",
+      "text": "Nova Reed's plan includes new books, study tables, accessible lighting, and shared workshops to revive the center."
+    },
+    {
+      "heading": "Your Impact",
+      "text": "Your support will provide a welcoming environment for learning, empowering the community to thrive and reach new heights."
+    }
+  ],
+  "execution": {
+    "id": "b4bfe2bc-3848-4ded-889f-b2880967cd78",
+    "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+    "status": "succeeded",
+    "completed_at": "2026-11-11T09:53:44.422Z"
+  }
+}

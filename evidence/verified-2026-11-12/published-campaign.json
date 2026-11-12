@@ -1,0 +1,41 @@
+{
+  "campaign": {
+    "id": "bc111194-28ce-4342-84a5-f567c9919cb1",
+    "owner_id": "e5e69672-29b7-4a7a-8504-82434d4e9892",
+    "title": "Nova Stars",
+    "summary": "Help Aurora Harbor rebuild with interstellar-themed workshops and accessible learning spaces",
+    "story": [
+      {
+        "text": "Aurora Harbor's learning center was damaged in a synthetic storm, leaving the community without a hub for education and growth. Nova Reed's initiative aims to rebuild the center with essential resources like books, study tables, and accessible lighting, fostering a nurturing environment for interstellar learners to thrive and explore.",
+        "heading": "The Need"
+      },
+      {
+        "text": "Nova Reed's plan includes new books, study tables, accessible lighting, and shared workshops to revive the center.",
+        "heading": "Our Plan"
+      },
+      {
+        "text": "Your support will provide a welcoming environment for learning, empowering the community to thrive and reach new heights.",
+        "heading": "Your Impact"
+      }
+    ],
+    "category": "education",
+    "goal_cents": 1250000,
+    "status": "published",
+    "organizer": "Nova Reed (fictional)",
+    "location": "Aurora Harbor (synthetic)",
+    "latitude": 37.3,
+    "longitude": -121.8,
+    "image_path": "/api/media/b3eced25-5493-4aba-9f18-886d9203ee2f",
+    "ai_request_ids": [
+      "78debfcb-8d00-4a61-a46a-400eb28300c2",
+      "29812bc8-1f56-435a-96b8-7f3c5c3063ea",
+      "95a46a09-deb2-4d54-9cd1-20a7e7dba24b",
+      "b4bfe2bc-3848-4ded-889f-b2880967cd78",
+      "90fbd15b-db90-4efa-8eaf-72affd6b0202"
+    ],
+    "fictional": true,
+    "version": 2,
+    "created_at": "2026-11-11T09:53:51.819459+00:00",
+    "updated_at": "2026-11-11T09:53:53.253+00:00"
+  }
+}

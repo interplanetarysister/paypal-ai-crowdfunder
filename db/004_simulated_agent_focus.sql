@@ -23,7 +23,7 @@ begin
     on conflict (campaign_id, agent_role) do nothing;
   end if;
   return new;
-end $;
+end $$;
 -- Trigger-only helper: do not leave PostgreSQL's default PUBLIC EXECUTE grant.
 revoke all on function public.ifund_demo_seed_focus_for_campaign() from public, anon, authenticated;
 grant execute on function public.ifund_demo_seed_focus_for_campaign() to service_role;

@@ -1,0 +1,9 @@
+{
+  "image_path": "/api/media/b3eced25-5493-4aba-9f18-886d9203ee2f",
+  "execution": {
+    "id": "29812bc8-1f56-435a-96b8-7f3c5c3063ea",
+    "model": "@cf/black-forest-labs/flux-1-schnell",
+    "status": "succeeded",
+    "completed_at": "2026-11-11T09:37:53.544Z"
+  }
+}

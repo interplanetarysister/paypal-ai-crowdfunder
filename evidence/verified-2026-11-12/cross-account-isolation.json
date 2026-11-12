@@ -1,0 +1,30 @@
+[
+  {
+    "path": "/api/receipts/2c55464e-50df-4760-b623-4117fec5e2d7",
+    "http": 404,
+    "expected": 404
+  },
+  {
+    "path": "/api/finance?view=admin",
+    "http": 403,
+    "expected": 403
+  },
+  {
+    "path": "/api/admin/tracker",
+    "http": 403,
+    "expected": 403
+  },
+  {
+    "path": "/api/finance?view=donor",
+    "http": 200,
+    "data": {
+      "orders": [],
+      "receipts": [],
+      "record_count": 0,
+      "pending_count": 0,
+      "captured_cents": 0,
+      "limited_to_latest": 200,
+      "platform_support_cents": 0
+    }
+  }
+]

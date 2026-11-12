@@ -69,7 +69,7 @@ export function Donut({ values, label, formatValue = (value: number) => value.to
   }, [chartValues]);
   return (
     <div className="demo-chart">
-      <div ref={element} role="img" aria-label={label} className="demo-chart-canvas" />
+      <div ref={element} role="group" aria-label={label} className="demo-chart-canvas" />
       {error && <p className="meta" role="status">Chart unavailable: {error}. Data remains accessible below.</p>}
       <ul className="chart-values">
         {values.map(({ name, value }) => <li key={name}><span>{name}</span><strong>{formatValue(value)}</strong></li>)}
