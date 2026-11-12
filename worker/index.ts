@@ -75,7 +75,7 @@ export async function handle(
         release_sha: env.RELEASE_SHA || "NOT_DEPLOYED",
         withdrawals_enabled: false,
         subscriptions_enabled: false,
-        provider_acceptance: "PROVIDER_CAPTURE_AND_SIGNATURE_VERIFIED__FULL_BUYER_REPLAY_PENDING",
+        provider_acceptance: "DATED_SANDBOX_EVIDENCE_2026_11_12",
       });
     if (
       ["POST", "PUT", "PATCH", "DELETE"].includes(request.method) &&

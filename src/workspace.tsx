@@ -319,8 +319,8 @@ export function Showcase() {
               : !status
                 ? "Checking…"
                 : status.provider_acceptance ===
-                    "PROVIDER_CAPTURE_AND_SIGNATURE_VERIFIED__FULL_BUYER_REPLAY_PENDING"
-                  ? "Sandbox capture and signature verified; fresh buyer/replay acceptance pending"
+                    "DATED_SANDBOX_EVIDENCE_2026_11_12"
+                  ? "Sandbox buyer approval, capture and signed replay verified November 12, 2026"
                   : "Full provider acceptance not yet verified"}
           </strong>
           . See the repository release report for dated evidence.
