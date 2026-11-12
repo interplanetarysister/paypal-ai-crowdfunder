@@ -1,0 +1,21 @@
+{
+  "url": "https://www.youtube.com/watch?v=mJ-80-LQG1g",
+  "title": "Interplanetary Fund Sandbox Demo - YouTube",
+  "visibility": "Public",
+  "duration": "PT2M49S",
+  "publication_date": "2026-11-11T15:00:19-08:00",
+  "devpost_project": 1484362,
+  "linked_video_verified": true,
+  "transcript_coverage": [
+    "ten-step sandbox guide",
+    "campaign discovery and category filters",
+    "AG Grid and charts",
+    "campaign details",
+    "PayPal Sandbox checkout entry"
+  ],
+  "limits": [
+    "Direct frame playback not independently inspected",
+    "Transcript agent role/focus claims are illustrative simulation; not proof of autonomous execution",
+    "Transcript calls globe AG Grid; implemented globe uses SVG with separate AG Grid table"
+  ]
+}

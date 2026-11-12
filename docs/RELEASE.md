@@ -45,7 +45,7 @@ The verified Worker runtime SHA is `4c2700439b2dff0d3e3fc3b89b182b8abda9dca3`. T
 
 GitHub Actions is **blocked externally**: GitHub's annotation says jobs were not started because the account is locked due to a billing issue. Local checks and actual Cloudflare builds are independent evidence; Actions is not described as passing. No paid plan or billing change was made.
 
-The official rules/dates were re-read November 12. Submission closes **November 12 at 20:00UTC / noon Pacific**. The existing submitted entry links to the dedicated guide. The existing public YouTube video is **2:01**, under three minutes; its current-release footage coverage remains **NOT VERIFIED** because direct playback could not be inspected in this environment. No personal eligibility attestations were invented. Maintain free judge access through **December 15, 16:00UTC**.
+The official rules/dates were re-read November 12. Submission closes **November 12 at 20:00UTC / noon Pacific**. The existing submitted entry links to the dedicated guide. The existing public YouTube video is **2:49**, under three minutes; its current-release footage coverage remains **NOT VERIFIED** because direct playback could not be inspected in this environment. No personal eligibility attestations were invented. Maintain free judge access through **December 15, 16:00UTC**.
 
 Optional Card Fields/3DS and a Postman desktop run remain **NOT VERIFIED** against the provider. Their unit/contract tests do not prove merchant eligibility or actual card acceptance. Image improvement, automatic social publishing, recurring billing and payouts are accurately unavailable. These are not represented as successful live functionality.
 

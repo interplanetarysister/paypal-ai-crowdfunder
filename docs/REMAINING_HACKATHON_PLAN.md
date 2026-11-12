@@ -16,7 +16,7 @@ The latest evidence is [RELEASE.md](RELEASE.md). Historical partial snapshots re
 | Responsive and accessibility tests                        | PASS                       | Four browser scenarios,1440/768/390px, axe scans and navigation                     |
 | Automated checks                                          | PASS                       | 20/20 tests plus lint/type/build                                                    |
 | GitHub-hosted CI                                          | BLOCKED                    | Account billing lock prevents runner start; local checks and Cloudflare builds used |
-| Existing public under-three-minute YouTube video          | PASS availability/duration | HkxIFqoEKs0,2:01                                                                    |
+| Existing public under-three-minute YouTube video          | PASS availability/duration | mJ-80-LQG1g,2:49                                                                    |
 | Existing video shows this current release                 | NOT VERIFIED               | Playback inspection blocked by network; transcript alone insufficient               |
 | Optional Card Fields/3DS provider acceptance              | NOT VERIFIED               | Do not advertise as provider-verified                                               |
 | Postman desktop collection execution                      | NOT VERIFIED               | Collection and contract tests exist; no desktop-run evidence                        |

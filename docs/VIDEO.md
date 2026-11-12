@@ -1,6 +1,8 @@
 # Demonstration video
 
-The existing submitted YouTube URL is https://www.youtube.com/watch?v=HkxIFqoEKs0. It was verified public on November 11, 2026, with metadata duration PT2M1S (the scraped display rounds to 02:00). Its transcript describes campaign creation. Those facts alone do not prove a sandbox capture is visible or that the recording matches this standalone release.
+The current submitted YouTube URL, freshly read from Devpost project1484362, is https://www.youtube.com/watch?v=mJ-80-LQG1g. It is public, titled “Interplanetary Fund Sandbox Demo,” published November11,2026 and duration PT2M49S (2:49). The English transcript covers the ten-step standalone sandbox guide, charts, filtered discovery, campaign details and PayPal checkout entry. Direct video frames were not inspected; transcript metadata does not prove a completed capture is shown. The earlier HkxIFqoEKs0 clip is historical, not the current submitted link.
+
+The video calls the globe AG Grid and describes agent attention as workload. The current implementation accurately labels the globe as SVG and role allocations as simulated; the separate table uses AG Grid Community. Actual AI model execution is evidenced independently in RELEASE.md. Do not treat illustrative role charts as autonomous agent execution.
 
 If a replacement is needed, record the actual configured app. Do not record a mocked provider test and present it as real PayPal or AI execution. Target **2 minutes 40 seconds**, leaving room below the three-minute guideline.
 

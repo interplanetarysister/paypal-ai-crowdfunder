@@ -459,10 +459,10 @@ export function Showcase() {
         </p>
         <p>
           Existing public video:{" "}
-          <a href="https://www.youtube.com/watch?v=HkxIFqoEKs0">
+          <a href="https://www.youtube.com/watch?v=mJ-80-LQG1g">
             InterplanetaryFund campaign creation
           </a>{" "}
-          (approximately two minutes). It is linked to the existing submitted
+          (2 minutes 49 seconds). It is linked to the existing submitted
           entry. Its coverage of this standalone sandbox release is unverified.
           The repository includes a replacement end-to-end recording script.
         </p>

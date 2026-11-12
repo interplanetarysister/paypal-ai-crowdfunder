@@ -10,7 +10,7 @@ This repository evolves the earlier local Crowdfunder demo into the IFund visual
 - **Postman sandbox API tests:** [importable collection](postman/IFund_PayPal_AI_Sandbox.postman_collection.json) (no secrets or card numbers).
 - **Final implementation and compliance gates:** [REMAINING_HACKATHON_PLAN.md](docs/REMAINING_HACKATHON_PLAN.md) and [RELEASE.md](docs/RELEASE.md).
 - Existing submitted entry: https://devpost.com/software/interplanetary-fund-5pznwy
-- Existing public video: https://www.youtube.com/watch?v=HkxIFqoEKs0 — approximately two minutes; coverage of this standalone sandbox release requires separate verification.
+- Existing public video: https://www.youtube.com/watch?v=mJ-80-LQG1g — 2 minutes 49 seconds; coverage of this standalone sandbox release requires separate verification.
 - Official rules: https://paypalaihackathon.devpost.com/rules
 - License: [GNU AGPL-3.0](LICENSE). [Attribution and provenance](docs/PROVENANCE.md).
 
